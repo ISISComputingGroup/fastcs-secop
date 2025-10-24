@@ -1,0 +1,101 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastcs-secop"  # REQUIRED, is the only field that cannot be marked as dynamic.
+dynamic = ["version"]
+description = "SECoP device support using FastCS"
+readme = "README.md"
+requires-python = ">=3.11"
+license-files = ["LICENSE"]
+
+authors = [
+  {name = "ISIS Experiment Controls", email = "ISISExperimentControls@stfc.ac.uk" }
+]
+maintainers = [
+  {name = "ISIS Experiment Controls", email = "ISISExperimentControls@stfc.ac.uk" }
+]
+
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+dependencies = [
+  "fastcs",
+]
+
+[project.optional-dependencies]
+doc = [
+  "sphinx", 
+  "sphinx_rtd_theme", 
+  "myst_parser",
+  "sphinx-autobuild",
+  "sphinxcontrib-mermaid",
+]
+dev = [
+  "fastcs-secop[doc]",
+  "ruff>=0.8",
+  "pyright",
+  "pytest",
+  "pytest-asyncio",
+  "pytest-cov",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/isiscomputinggroup/fastcs-secop"
+"Bug Reports" = "https://github.com/isiscomputinggroup/fastcs-secop/issues"
+"Source" = "https://github.com/isiscomputinggroup/fastcs-secop"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+asyncio_mode = "auto"
+addopts = "--cov --cov-report=html -vv"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+fail_under = 100
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:",
+  "@abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "coverage_html_report"
+
+[tool.pyright]
+include = ["src", "tests"]
+reportConstantRedefinition = true
+reportDeprecated = true
+reportInconsistentConstructor = true
+reportMissingParameterType = true
+reportMissingTypeArgument = true
+reportUnnecessaryCast = true
+reportUnnecessaryComparison = true
+reportUnnecessaryContains = true
+reportUnnecessaryIsInstance = true
+reportUntypedBaseClass = true
+reportUntypedClassDecorator = true
+reportUntypedFunctionDecorator = true
+
+[tool.setuptools_scm]
+version_file = "src/fastcs_secop/version.py"
+
+[tool.build_sphinx]
+
