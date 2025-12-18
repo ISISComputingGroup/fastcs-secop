@@ -33,7 +33,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "fastcs",
+  "fastcs[epics]",
 ]
 
 [project.optional-dependencies]
@@ -46,11 +46,12 @@ doc = [
 ]
 dev = [
   "fastcs-secop[doc]",
-  "ruff>=0.8",
+  "lewis",
   "pyright",
   "pytest",
   "pytest-asyncio",
   "pytest-cov",
+  "ruff",
 ]
 
 [project.urls]
