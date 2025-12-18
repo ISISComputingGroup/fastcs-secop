@@ -9,8 +9,9 @@ from lewis.utils.command_builder import CmdBuilder
 @has_log
 class SimpleSecopStreamInterface(StreamInterface):
     commands = {
-        # ID
         CmdBuilder("idn").escape("*IDN?").optional("\r").eos().build(),
+        CmdBuilder("deactivate").escape("deactivate").optional(" .").optional("\r").eos().build(),
+        CmdBuilder("activate").escape("activate").optional(" .").optional("\r").eos().build(),
         CmdBuilder("describe").escape("describe").optional("\r").eos().build(),
         CmdBuilder("change")
         .escape("change ")
@@ -57,3 +58,9 @@ class SimpleSecopStreamInterface(StreamInterface):
     def read(self, module: str, accessible: str):
         data_report = self._device.modules[module].accessibles[accessible].data_report()
         return f"reply {module}:{accessible} {json.dumps(data_report)}"
+
+    def deactivate(self):
+        return "inactive"
+
+    def activate(self):
+        raise ValueError("emulator does not (yet) support sending asynchronous updates.")
