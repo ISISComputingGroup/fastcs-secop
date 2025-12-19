@@ -1,9 +1,14 @@
+import base64
+import enum
 import json
 import logging
+import math
 import typing
+import uuid
 from dataclasses import dataclass
 from logging import getLogger
 
+import numpy as np
 from fastcs.attributes import AttributeIO, AttributeIORef, AttrR, AttrRW, AttrW
 from fastcs.connections import IPConnection, IPConnectionSettings
 from fastcs.controllers import Controller
@@ -44,6 +49,8 @@ class SecopError(Exception):
 class SecopAttributeIORef(AttributeIORef):
     module_name: str = ""
     accessible_name: str = ""
+    decode: callable = lambda x: x
+    encode: callable = lambda x: x
 
 
 def format_string_to_prec(fmt_str: str | None) -> int | None:
@@ -78,9 +85,11 @@ class SecopAttributeIO(AttributeIO[NumberT, SecopAttributeIORef]):
                     f"Invalid response to 'read' command by SECoP device: '{response}'"
                 )
 
-            value = json.loads(response[len(prefix) :])
+            value = json.loads(response[len(prefix) :])[0]
 
-            await attr.update(attr.dtype(value[0]))
+            value = attr.io_ref.decode(value)
+
+            await attr.update(value)
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass
@@ -125,23 +134,108 @@ class SecopModuleController(Controller):
         for parameter_name, parameter in self._module["accessibles"].items():
             datainfo = parameter["datainfo"]
             secop_dtype = datainfo["type"]
+
+            min_val = datainfo.get("min")
+            max_val = datainfo.get("max")
+            scale = datainfo.get("scale")
+
             if secop_dtype == "command":
                 # TODO: handle commands
                 pass
-            elif secop_dtype == "double":
+            elif secop_dtype in ["double", "scaled"]:
+                if min_val is not None and scale is not None:
+                    min_val *= scale
+                if max_val is not None and scale is not None:
+                    max_val *= scale
+
                 self.add_attribute(
                     parameter_name,
                     AttrRW(
                         Float(
                             units=datainfo.get("unit", None),
-                            min_alarm=datainfo.get("min", None),
-                            max_alarm=datainfo.get("max", None),
+                            min_alarm=min_val,
+                            max_alarm=max_val,
                             prec=format_string_to_prec(datainfo.get("fmtstr", None)) or 6,
                         ),
                         io_ref=SecopAttributeIORef(
                             module_name=self._module_name,
                             accessible_name=parameter_name,
-                            update_period=1,
+                            update_period=1.0,
+                            decode=lambda x: x * scale if scale is not None else x,
+                            encode=lambda x: int(math.round(x / scale)) if scale is not None else x,
+                        ),
+                        description=parameter.get("description", ""),
+                    ),
+                )
+            elif secop_dtype == "int":
+                self.add_attribute(
+                    parameter_name,
+                    AttrRW(
+                        Int(
+                            units=datainfo.get("unit", None),
+                            min_alarm=min_val,
+                            max_alarm=max_val,
+                        ),
+                        io_ref=SecopAttributeIORef(
+                            module_name=self._module_name,
+                            accessible_name=parameter_name,
+                            update_period=1.0,
+                        ),
+                        description=parameter.get("description", ""),
+                    ),
+                )
+            elif secop_dtype == "bool":
+                self.add_attribute(
+                    parameter_name,
+                    AttrRW(
+                        Bool(),
+                        io_ref=SecopAttributeIORef(
+                            module_name=self._module_name,
+                            accessible_name=parameter_name,
+                            update_period=1.0,
+                        ),
+                        description=parameter.get("description", ""),
+                    ),
+                )
+            elif secop_dtype == "enum":
+                enum_type = enum.Enum("enum_type", datainfo["members"])
+
+                self.add_attribute(
+                    parameter_name,
+                    AttrRW(
+                        Enum(enum_type),
+                        io_ref=SecopAttributeIORef(
+                            module_name=self._module_name,
+                            accessible_name=parameter_name,
+                            update_period=1.0,
+                        ),
+                        description=parameter.get("description", ""),
+                    ),
+                )
+            elif secop_dtype == "string":
+                self.add_attribute(
+                    parameter_name,
+                    AttrRW(
+                        String(),
+                        io_ref=SecopAttributeIORef(
+                            module_name=self._module_name,
+                            accessible_name=parameter_name,
+                            update_period=1.0,
+                        ),
+                        description=parameter.get("description", ""),
+                    ),
+                )
+            elif secop_dtype == "blob":
+                self.add_attribute(
+                    parameter_name,
+                    AttrRW(
+                        Waveform(np.uint8, shape=(datainfo["maxbytes"],)),
+                        io_ref=SecopAttributeIORef(
+                            module_name=self._module_name,
+                            accessible_name=parameter_name,
+                            update_period=1.0,
+                            decode=lambda x: np.frombuffer(base64.b64decode(x), dtype=np.uint8),
+                            encode=base64.b64encode,
                         ),
                         description=parameter.get("description", ""),
                     ),
@@ -159,9 +253,15 @@ class SecopController(Controller):
         await self._connection.connect(self._ip_settings)
 
     @scan(15.0)
-    async def attempt_reconnect_if_sending_idn_fails(self) -> None:
+    async def ping(self) -> None:
+        """Ping the SECoP device, to check connection is still open.
+
+        Attempts to reconnect if the connection was not open (e.g. closed
+        by remote end or network break).
+        """
         try:
-            await self._connection.send_query("*IDN?\n")
+            token = uuid.uuid4()
+            await self._connection.send_query(f"ping {token}\n")
         except ConnectionError:
             logger.info("Detected connection loss, attempting reconnect.")
             try:

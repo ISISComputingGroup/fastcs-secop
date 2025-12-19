@@ -1,4 +1,5 @@
 import json
+import time
 import typing
 
 from lewis.adapters.stream import StreamInterface
@@ -10,6 +11,7 @@ from lewis.utils.command_builder import CmdBuilder
 class SimpleSecopStreamInterface(StreamInterface):
     commands = {
         CmdBuilder("idn").escape("*IDN?").optional("\r").eos().build(),
+        CmdBuilder("ping").escape("ping ").any().optional("\r").eos().build(),
         CmdBuilder("deactivate").escape("deactivate").optional(" .").optional("\r").eos().build(),
         CmdBuilder("activate").escape("activate").optional(" .").optional("\r").eos().build(),
         CmdBuilder("describe").escape("describe").optional("\r").eos().build(),
@@ -46,6 +48,9 @@ class SimpleSecopStreamInterface(StreamInterface):
 
     def idn(self):
         return "ISSE&SINE2020,SECoP,V0000.00.00,lewis_emulator"
+
+    def ping(self, token):
+        return f"pong {token} {json.dumps([None, {'t': time.time()}])}"
 
     def describe(self):
         return f"describing . {json.dumps(self._device.descriptor())}"
