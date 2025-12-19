@@ -13,9 +13,13 @@ class Accessible:
 
 
 class Parameter(Accessible):
-    def __init__(self, value):
+    def __init__(self, value, dtype="double", unit="", prec=3, desc=""):
         super().__init__()
         self.value = value
+        self.dtype = dtype
+        self.unit = unit
+        self.prec = prec
+        self.desc = desc
 
     def data_report(self):
         return [
@@ -27,9 +31,11 @@ class Parameter(Accessible):
 
     def descriptor(self) -> dict[str, typing.Any]:
         return {
-            "description": "some_parameter_description",
+            "description": self.desc,
             "datainfo": {
                 "type": "double",
+                "fmtstr": f"%.{self.prec}f",
+                "unit": self.unit,
             },
             "readonly": False,
         }
@@ -51,9 +57,9 @@ class Command(Accessible):
 class Module:
     def __init__(self):
         self.accessibles = {
-            "p1": Parameter(1),
-            "p2": Parameter(2),
-            "p3": Parameter(3),
+            "p1": Parameter(1, unit="mm", prec=2, desc="parameter one"),
+            "p2": Parameter(2, unit="uA", prec=4, desc="parameter two"),
+            "p3": Parameter(3, unit="kV", prec=1, desc="parameter three"),
         }
         self.description = "foo"
 

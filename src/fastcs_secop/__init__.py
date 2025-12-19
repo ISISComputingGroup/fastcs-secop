@@ -46,6 +46,19 @@ class SecopAttributeIORef(AttributeIORef):
     accessible_name: str = ""
 
 
+def format_string_to_prec(fmt_str: str | None) -> int | None:
+    """
+    Convert a SECoP format-string specifier to a precision.
+    """
+    if fmt_str is None:
+        return None
+
+    if fmt_str.startswith("%.") and fmt_str.endswith("f"):
+        return int(fmt_str[2:-1])
+
+    return None
+
+
 class SecopAttributeIO(AttributeIO[NumberT, SecopAttributeIORef]):
     def __init__(self, *, connection: IPConnection) -> None:
         super().__init__()
@@ -110,21 +123,29 @@ class SecopModuleController(Controller):
 
     async def initialise(self) -> None:
         for parameter_name, parameter in self._module["accessibles"].items():
-            # secop_dtype = parameter["type"]
-            # if secop_dtype == "command":
-            #     self.add_attribute()
-
-            self.add_attribute(
-                parameter_name,
-                AttrRW(
-                    Float(),
-                    io_ref=SecopAttributeIORef(
-                        module_name=self._module_name,
-                        accessible_name=parameter_name,
-                        update_period=1,
+            datainfo = parameter["datainfo"]
+            secop_dtype = datainfo["type"]
+            if secop_dtype == "command":
+                # TODO: handle commands
+                pass
+            elif secop_dtype == "double":
+                self.add_attribute(
+                    parameter_name,
+                    AttrRW(
+                        Float(
+                            units=datainfo.get("unit", None),
+                            min_alarm=datainfo.get("min", None),
+                            max_alarm=datainfo.get("max", None),
+                            prec=format_string_to_prec(datainfo.get("fmtstr", None)) or 6,
+                        ),
+                        io_ref=SecopAttributeIORef(
+                            module_name=self._module_name,
+                            accessible_name=parameter_name,
+                            update_period=1,
+                        ),
+                        description=parameter.get("description", ""),
                     ),
-                ),
-            )
+                )
 
 
 class SecopController(Controller):
