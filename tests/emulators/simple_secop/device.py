@@ -85,12 +85,10 @@ class OneOfEachDtypeModule:
             "int": Parameter(73, desc="an integer parameter", dtype="int"),
             "bool": Parameter(True, desc="a boolean parameter", dtype="bool"),
             "enum": Parameter(
-                1,
+                3,
                 desc="an enum parameter",
                 dtype="enum",
-                extra_datainfo={
-                    "members": {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
-                },
+                extra_datainfo={"members": {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5}},
             ),
             "string": Parameter("hello", desc="a string parameter", dtype="string"),
             "blob": Parameter(
@@ -100,6 +98,24 @@ class OneOfEachDtypeModule:
                 value_encoder=lambda x: base64.b64encode(x).decode("ascii"),
                 extra_datainfo={"maxbytes": 512},
             ),
+            "double_array": Parameter(
+                [1.414, 1.618, 2.718, 3.14159],
+                desc="a double array parameter",
+                dtype="array",
+                extra_datainfo={"maxlen": 512, "members": {"type": "double"}},
+            ),
+            "int_array": Parameter(
+                [1, 1, 2, 3, 5, 8, 13],
+                desc="an integer array parameter",
+                dtype="array",
+                extra_datainfo={"maxlen": 512, "members": {"type": "int"}},
+            ),
+            "bool_array": Parameter(
+                [True, True, False, True, False, False, True, True],
+                desc="a bool array parameter",
+                dtype="array",
+                extra_datainfo={"maxlen": 512, "members": {"type": "bool"}},
+            ),
         }
 
         self.description = "a module with one accessible of each possible dtype"
@@ -108,7 +124,7 @@ class OneOfEachDtypeModule:
         return {
             "implementation": __name__,
             "description": self.description,
-            "interface_classes": ["Readable"],
+            "interface_classes": [],
             "accessibles": {
                 name: accessible.descriptor() for name, accessible in self.accessibles.items()
             },
@@ -119,9 +135,7 @@ class SimulatedSecopNode(StateMachineDevice):
     def _initialize_data(self):
         """Initialize the device's attributes."""
         self.modules = {
-            "mod1": OneOfEachDtypeModule(),
-            "mod2": OneOfEachDtypeModule(),
-            "mod3": OneOfEachDtypeModule(),
+            "one_of_everything": OneOfEachDtypeModule(),
         }
 
     def _get_state_handlers(self):
@@ -135,7 +149,7 @@ class SimulatedSecopNode(StateMachineDevice):
 
     def descriptor(self) -> dict[str, typing.Any]:
         return {
-            "equipment_id": "fastcs_secop-lewis-emulator",
-            "description": "Simple SECoP emulator",
+            "equipment_id": __name__,
+            "description": "SECoP lewis emulator",
             "modules": {name: module.descriptor() for name, module in self.modules.items()},
         }

@@ -2,17 +2,17 @@ import base64
 import enum
 import json
 import logging
-import math
 import typing
 import uuid
 from dataclasses import dataclass
 from logging import getLogger
 
 import numpy as np
+import numpy.typing as npt
 from fastcs.attributes import AttributeIO, AttributeIORef, AttrR, AttrRW, AttrW
 from fastcs.connections import IPConnection, IPConnectionSettings
 from fastcs.controllers import Controller
-from fastcs.datatypes import Bool, Enum, Float, Int, String, Table, Waveform
+from fastcs.datatypes import Bool, Enum, Float, Int, String, Waveform
 from fastcs.launch import FastCS
 from fastcs.logging import LogLevel, configure_logging
 from fastcs.methods import scan
@@ -23,22 +23,6 @@ NumberT = typing.TypeVar("NumberT", int, float)
 
 
 logger = getLogger(__name__)
-
-
-SECOP_DATATYPES = {
-    "double": Float,
-    "scaled": Float,  # TODO:
-    "int": Int,
-    "bool": Bool,
-    "enum": Enum,
-    "string": String,
-    "blob": Waveform,  # TODO: waveform[u8] really
-    "array": Waveform,  # TODO: specify generic type
-    "tuple": Table,  # Table of anonymous arrays (all of which happen to have length 1)
-    "struct": Table,  # Table of named arrays (all of which happen to have length 1)
-    "matrix": Waveform,  # Maybe?
-    "command": ...,  # Special treatment - it's an AttrX
-}
 
 
 class SecopError(Exception):
@@ -66,6 +50,17 @@ def format_string_to_prec(fmt_str: str | None) -> int | None:
     return None
 
 
+def secop_dtype_to_numpy_dtype(secop_dtype: str) -> str:
+    if secop_dtype == "double":
+        return "float64"
+    elif secop_dtype == "int":
+        return "int32"
+    elif secop_dtype == "bool":
+        return "int32"
+    else:
+        raise SecopError(f"Cannot handle SECoP dtype '{secop_dtype}' within array/struct/tuple")
+
+
 class SecopAttributeIO(AttributeIO[NumberT, SecopAttributeIORef]):
     def __init__(self, *, connection: IPConnection) -> None:
         super().__init__()
@@ -86,9 +81,7 @@ class SecopAttributeIO(AttributeIO[NumberT, SecopAttributeIORef]):
                 )
 
             value = json.loads(response[len(prefix) :])[0]
-
             value = attr.io_ref.decode(value)
-
             await attr.update(value)
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
@@ -162,7 +155,7 @@ class SecopModuleController(Controller):
                             accessible_name=parameter_name,
                             update_period=1.0,
                             decode=lambda x: x * scale if scale is not None else x,
-                            encode=lambda x: int(math.round(x / scale)) if scale is not None else x,
+                            encode=lambda x: int(round(x / scale)) if scale is not None else x,
                         ),
                         description=parameter.get("description", ""),
                     ),
@@ -198,6 +191,7 @@ class SecopModuleController(Controller):
                     ),
                 )
             elif secop_dtype == "enum":
+                # TODO: Bug - this doesn't work properly with PVA?
                 enum_type = enum.Enum("enum_type", datainfo["members"])
 
                 self.add_attribute(
@@ -236,6 +230,29 @@ class SecopModuleController(Controller):
                             update_period=1.0,
                             decode=lambda x: np.frombuffer(base64.b64decode(x), dtype=np.uint8),
                             encode=base64.b64encode,
+                        ),
+                        description=parameter.get("description", ""),
+                    ),
+                )
+            elif secop_dtype == "array":
+                inner_dtype = datainfo["members"]["type"]
+                if inner_dtype not in ["double", "int", "bool"]:
+                    raise SecopError(f"Cannot handle inner dtype {inner_dtype} in array.")
+
+                np_inner_dtype = secop_dtype_to_numpy_dtype(inner_dtype)
+
+                def decode(x: list[int | float], t: npt.DTypeLike = np_inner_dtype) -> npt.NDArray:
+                    return np.array(x, dtype=t)
+
+                self.add_attribute(
+                    parameter_name,
+                    AttrRW(
+                        Waveform(np_inner_dtype, shape=(datainfo["maxlen"],)),
+                        io_ref=SecopAttributeIORef(
+                            module_name=self._module_name,
+                            accessible_name=parameter_name,
+                            update_period=1.0,
+                            decode=decode,
                         ),
                         description=parameter.get("description", ""),
                     ),

@@ -44,13 +44,23 @@ async def controller():
 
 
 async def test_sub_controllers_created(controller):
-    assert "mod1" in controller.sub_controllers
-    assert "mod2" in controller.sub_controllers
-    assert "mod3" in controller.sub_controllers
+    assert "one_of_everything" in controller.sub_controllers
 
 
-async def test_attributes_created(controller):
-    for mod in ["mod1", "mod2", "mod3"]:
-        assert "p1" in controller.sub_controllers[mod].attributes
-        assert "p2" in controller.sub_controllers[mod].attributes
-        assert "p3" in controller.sub_controllers[mod].attributes
+@pytest.mark.parametrize(
+    "param",
+    [
+        "double",
+        "scaled",
+        "int",
+        "bool",
+        "enum",
+        "string",
+        "blob",
+        "int_array",
+        "bool_array",
+        "double_array",
+    ],
+)
+async def test_attributes_created(controller, param):
+    assert param in controller.sub_controllers["one_of_everything"].attributes
