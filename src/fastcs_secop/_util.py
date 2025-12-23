@@ -1,0 +1,2 @@
+class SecopError(Exception):
+    pass

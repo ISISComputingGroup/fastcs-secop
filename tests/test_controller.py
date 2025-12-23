@@ -1,4 +1,4 @@
-from fastcs_secop import format_string_to_prec
+from fastcs_secop._controllers import format_string_to_prec
 
 
 def test_format_string_to_prec():

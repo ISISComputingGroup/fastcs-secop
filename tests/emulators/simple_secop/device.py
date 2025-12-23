@@ -72,7 +72,7 @@ class OneOfEachDtypeModule:
     def __init__(self):
         self.accessibles = {
             "double": Parameter(
-                1.2345, unit="mm", prec=2, desc="a double parameter", dtype="double"
+                1.2345, unit="mm", prec=4, desc="a double parameter", dtype="double"
             ),
             "scaled": Parameter(
                 42,
