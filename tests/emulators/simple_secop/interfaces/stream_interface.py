@@ -9,7 +9,7 @@ from lewis.utils.command_builder import CmdBuilder
 
 @has_log
 class SimpleSecopStreamInterface(StreamInterface):
-    commands = {
+    commands: typing.ClassVar = {
         CmdBuilder("idn").escape("*IDN?").optional("\r").eos().build(),
         CmdBuilder("ping").escape("ping ").any().optional("\r").eos().build(),
         CmdBuilder("deactivate").escape("deactivate").optional(" .").optional("\r").eos().build(),
@@ -39,9 +39,7 @@ class SimpleSecopStreamInterface(StreamInterface):
     out_terminator = "\n"
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}: {}\n".format(
-            request, error.__class__.__name__, error
-        )
+        err_string = f"command was: {request}, error was: {error.__class__.__name__}: {error}\n"
         print(err_string)
         self.log.error(err_string)
         return err_string

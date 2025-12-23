@@ -1,3 +1,5 @@
+"""SECoP support using FastCS."""
+
 import logging
 from logging import getLogger
 
@@ -14,12 +16,12 @@ logger = getLogger(__name__)
 
 __all__ = [
     "SecopController",
-    "SecopModuleController",
     "SecopError",
+    "SecopModuleController",
 ]
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     configure_logging(level=LogLevel.DEBUG)
 
     logging.basicConfig(level=LogLevel.DEBUG)

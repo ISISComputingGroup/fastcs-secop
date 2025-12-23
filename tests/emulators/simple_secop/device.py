@@ -1,4 +1,5 @@
 import base64
+import math
 import time
 import typing
 from collections import OrderedDict
@@ -99,7 +100,7 @@ class OneOfEachDtypeModule:
                 extra_datainfo={"maxbytes": 512},
             ),
             "double_array": Parameter(
-                [1.414, 1.618, 2.718, 3.14159],
+                [1.414, 1.618, math.e, math.pi],
                 desc="a double array parameter",
                 dtype="array",
                 extra_datainfo={"maxlen": 512, "members": {"type": "double"}},

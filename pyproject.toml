@@ -33,7 +33,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "fastcs[epics]",
+  "fastcs[epics] @ git+https://github.com/Tom-Willemsen/FastCS@guard_methods_that_dont_work_on_windows",
 ]
 
 [project.optional-dependencies]
@@ -81,7 +81,7 @@ exclude_lines = [
 directory = "coverage_html_report"
 
 [tool.pyright]
-include = ["src", "tests"]
+include = ["src"]
 reportConstantRedefinition = true
 reportDeprecated = true
 reportInconsistentConstructor = true

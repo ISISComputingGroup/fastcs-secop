@@ -20,9 +20,7 @@ logger = getLogger(__name__)
 
 
 def format_string_to_prec(fmt_str: str | None) -> int | None:
-    """
-    Convert a SECoP format-string specifier to a precision.
-    """
+    """Convert a SECoP format-string specifier to a precision."""
     if fmt_str is None:
         return None
 
@@ -32,13 +30,13 @@ def format_string_to_prec(fmt_str: str | None) -> int | None:
     return None
 
 
-def secop_dtype_to_numpy_dtype(secop_dtype: str) -> str:
+def secop_dtype_to_numpy_dtype(secop_dtype: str) -> npt.DTypeLike:
     if secop_dtype == "double":
-        return "float64"
+        return np.float64
     elif secop_dtype == "int":
-        return "int32"
+        return np.int32
     elif secop_dtype == "bool":
-        return "int32"
+        return np.bool_
     else:
         raise SecopError(f"Cannot handle SECoP dtype '{secop_dtype}' within array/struct/tuple")
 
@@ -68,7 +66,7 @@ class SecopModuleController(Controller):
             if secop_dtype == "command":
                 # TODO: handle commands
                 pass
-            elif secop_dtype in ["double", "scaled"]:
+            elif secop_dtype in {"double", "scaled"}:
                 if min_val is not None and scale is not None:
                     min_val *= scale
                 if max_val is not None and scale is not None:
@@ -88,7 +86,7 @@ class SecopModuleController(Controller):
                             accessible_name=parameter_name,
                             update_period=1.0,
                             decode=lambda x, s=scale: x * s if s is not None else x,
-                            encode=lambda x, s=scale: int(round(x / s)) if s is not None else x,
+                            encode=lambda x, s=scale: round(x / s) if s is not None else x,
                         ),
                         description=parameter.get("description", ""),
                     ),
@@ -169,14 +167,11 @@ class SecopModuleController(Controller):
                 )
             elif secop_dtype == "array":
                 inner_dtype = datainfo["members"]["type"]
-                if inner_dtype not in ["double", "int", "bool"]:
-                    raise SecopError(f"Cannot handle inner dtype {inner_dtype} in array.")
-
                 np_inner_dtype = secop_dtype_to_numpy_dtype(inner_dtype)
 
                 def decode(
                     x: list[int | float | bool], t: npt.DTypeLike = np_inner_dtype
-                ) -> npt.NDArray:
+                ) -> npt.NDArray[np.int32 | np.float64 | np.bool_]:
                     return np.array(x, dtype=t)
 
                 self.add_attribute(
@@ -223,20 +218,20 @@ class SecopController(Controller):
                 logger.info("Reconnect failed.")
 
     async def check_idn(self) -> None:
-        """
-        Checks that the response to *IDN? indicates this is a SECoP device.
+        """Check that the response to *IDN? indicates this is a SECoP device.
 
         Raises:
             ValueError: if device is not a SECoP device.
+
         """
         identification = await self._connection.send_query("*IDN?\n")
         identification = identification.strip()
 
-        manufacturer, product, draft_date, version = identification.split(",")
-        if manufacturer not in [
+        manufacturer, product, _, _ = identification.split(",")
+        if manufacturer not in {
             "ISSE&SINE2020",  # SECOP 1.x
             "ISSE",  # SECOP 2.x
-        ]:
+        }:
             raise SecopError(
                 f"Device responded to '*IDN?' with bad manufacturer string '{manufacturer}'. "
                 f"Not a SECoP device?"

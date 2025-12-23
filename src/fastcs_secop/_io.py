@@ -17,8 +17,8 @@ NumberT = typing.TypeVar("NumberT", int, float)
 class SecopAttributeIORef(AttributeIORef):
     module_name: str = ""
     accessible_name: str = ""
-    decode: callable = lambda x: x
-    encode: callable = lambda x: x
+    decode: typing.Callable[[typing.Any], typing.Any] = lambda x: x
+    encode: typing.Callable[[typing.Any], typing.Any] = lambda x: x
 
 
 class SecopAttributeIO(AttributeIO[NumberT, SecopAttributeIORef]):
