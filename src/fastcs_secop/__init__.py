@@ -14,11 +14,7 @@ from fastcs_secop._util import SecopError
 
 logger = getLogger(__name__)
 
-__all__ = [
-    "SecopController",
-    "SecopError",
-    "SecopModuleController",
-]
+__all__ = ["SecopController", "SecopError", "SecopModuleController"]
 
 
 if __name__ == "__main__":  # pragma: no cover

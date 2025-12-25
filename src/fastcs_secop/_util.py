@@ -1,2 +1,2 @@
 class SecopError(Exception):
-    pass
+    """Error raised to identify a SECoP protocol or configuration problem."""

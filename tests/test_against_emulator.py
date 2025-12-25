@@ -54,7 +54,7 @@ async def controller():
         except Exception:
             await asyncio.sleep(0.1)
     else:
-        raise RuntimeError("Could not connect to emulator")
+        raise RuntimeError("Could not connect to emulator within 10s")
 
     fastcs = FastCS(
         controller,

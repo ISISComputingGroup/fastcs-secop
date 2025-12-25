@@ -49,6 +49,19 @@ class SecopModuleController(Controller):
         module_name: str,
         module: dict[str, typing.Any],
     ) -> None:
+        """FastCS controller for a SECoP module.
+
+        Instances of this class are added as subcontrollers by
+        :py:obj:`SecopController`.
+
+        Args:
+            connection: The connection to use.
+            module_name: The name of the SECoP module.
+            module: A deserialised description, in the
+                :external+secop:doc:`SECoP over-the-wire format <specification/descriptive>`,
+                of this module.
+
+        """
         self._io = SecopAttributeIO(connection=connection)
         self._module_name = module_name
         self._module = module
@@ -191,6 +204,13 @@ class SecopModuleController(Controller):
 
 class SecopController(Controller):
     def __init__(self, settings: IPConnectionSettings) -> None:
+        """FastCS Controller for a SECoP node.
+
+        Args:
+            settings: The communication settings (e.g. IP address, port) at which
+                the SECoP node is reachable.
+
+        """
         self._ip_settings = settings
         self._connection = IPConnection()
 
@@ -198,6 +218,13 @@ class SecopController(Controller):
 
     async def connect(self) -> None:
         await self._connection.connect(self._ip_settings)
+
+    async def deactivate(self) -> None:
+        """Turn off asynchronous SECoP communication.
+
+        See :external+secop:doc:`specification/messages/activation` for details.
+        """
+        await self._connection.send_query("deactivate\n")
 
     @scan(15.0)
     async def ping(self) -> None:
@@ -213,15 +240,19 @@ class SecopController(Controller):
             logger.info("Detected connection loss, attempting reconnect.")
             try:
                 await self.connect()
+                await self.deactivate()
                 logger.info("Reconnect successful.")
             except Exception:
                 logger.info("Reconnect failed.")
 
     async def check_idn(self) -> None:
-        """Check that the response to *IDN? indicates this is a SECoP device.
+        """Verify that the device is a SECoP device.
+
+        This is checked using the SECoP
+        :external+secop:doc:`identification message <specification/messages/identification>`.
 
         Raises:
-            ValueError: if device is not a SECoP device.
+            SecopError: if the device is not a SECoP device.
 
         """
         identification = await self._connection.send_query("*IDN?\n")
@@ -246,11 +277,28 @@ class SecopController(Controller):
         print(f"Connected to SECoP device with IDN='{identification}'.")
 
     async def initialise(self) -> None:
+        """Set up FastCS for this SECoP node.
+
+        This introspects the
+        :external+secop:doc:`description <specification/messages/description>`
+        of the SECoP device to determine the names and contents of the modules
+        in this SECoP node.
+
+        A subcontroller of type :py:obj:`SecopModuleController` is added for
+        each discovered module.
+
+        This controller attempts to periodically reconnect to the device if the
+        connection was closed, and disables asynchronous messages on instantiation.
+
+        Raises:
+            SecopError: if the device is not a SECoP device, if a reply in an
+                unexpected format is received, or the SECoP node's configuration
+                cannot be handled by :py:obj:`fastcs_secop`.
+
+        """
         await self.connect()
         await self.check_idn()
-
-        # Turn off asynchronous replies.
-        await self._connection.send_query("deactivate\n")
+        await self.deactivate()
 
         descriptor = await self._connection.send_query("describe\n")
         if not descriptor.startswith("describing . "):
