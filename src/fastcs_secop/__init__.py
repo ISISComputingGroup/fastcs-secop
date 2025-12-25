@@ -28,6 +28,6 @@ if __name__ == "__main__":  # pragma: no cover
 
     fastcs = FastCS(
         SecopController(settings=IPConnectionSettings(ip="127.0.0.1", port=57677)),
-        [epics_ca],
+        [epics_pva],
     )
     fastcs.run(interactive=False)

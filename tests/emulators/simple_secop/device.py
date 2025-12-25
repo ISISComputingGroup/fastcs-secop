@@ -117,6 +117,12 @@ class OneOfEachDtypeModule:
                 dtype="array",
                 extra_datainfo={"maxlen": 512, "members": {"type": "bool"}},
             ),
+            "tuple": Parameter(
+                [1, 5.678, True],
+                desc="a tuple of int, float, bool",
+                dtype="tuple",
+                extra_datainfo={"members": [{"type": "int"}, {"type": "double"}, {"type": "bool"}]},
+            ),
         }
 
         self.description = "a module with one accessible of each possible dtype"

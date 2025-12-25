@@ -42,7 +42,7 @@ def test_format_string_to_prec(secop_fmt, prec):
     [
         ("int", np.int32),
         ("double", np.float64),
-        ("bool", np.bool_),
+        ("bool", np.uint8),
     ],
 )
 def test_secop_dtype_to_numpy_dtype(secop_dtype, np_dtype):

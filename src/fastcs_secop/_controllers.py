@@ -7,10 +7,10 @@ from logging import getLogger
 
 import numpy as np
 import numpy.typing as npt
-from fastcs.attributes import AttrRW
+from fastcs.attributes import AttrR, AttrRW
 from fastcs.connections import IPConnection, IPConnectionSettings
 from fastcs.controllers import Controller
-from fastcs.datatypes import Bool, Enum, Float, Int, String, Waveform
+from fastcs.datatypes import Bool, Enum, Float, Int, String, Table, Waveform
 from fastcs.methods import scan
 
 from fastcs_secop._io import SecopAttributeIO, SecopAttributeIORef
@@ -36,7 +36,7 @@ def secop_dtype_to_numpy_dtype(secop_dtype: str) -> npt.DTypeLike:
     elif secop_dtype == "int":
         return np.int32
     elif secop_dtype == "bool":
-        return np.bool_
+        return np.uint8
     else:
         raise SecopError(f"Cannot handle SECoP dtype '{secop_dtype}' within array/struct/tuple")
 
@@ -62,10 +62,9 @@ class SecopModuleController(Controller):
                 of this module.
 
         """
-        self._io = SecopAttributeIO(connection=connection)
         self._module_name = module_name
         self._module = module
-        super().__init__(ios=[self._io])
+        super().__init__(ios=[SecopAttributeIO(connection=connection)])
 
     async def initialise(self) -> None:
         for parameter_name, parameter in self._module["accessibles"].items():
@@ -75,6 +74,8 @@ class SecopModuleController(Controller):
             min_val = datainfo.get("min")
             max_val = datainfo.get("max")
             scale = datainfo.get("scale")
+
+            attr_cls = AttrR if parameter.get("readonly", False) else AttrRW
 
             if secop_dtype == "command":
                 # TODO: handle commands
@@ -87,7 +88,7 @@ class SecopModuleController(Controller):
 
                 self.add_attribute(
                     parameter_name,
-                    AttrRW(
+                    attr_cls(
                         Float(
                             units=datainfo.get("unit", None),
                             min_alarm=min_val,
@@ -107,7 +108,7 @@ class SecopModuleController(Controller):
             elif secop_dtype == "int":
                 self.add_attribute(
                     parameter_name,
-                    AttrRW(
+                    attr_cls(
                         Int(
                             units=datainfo.get("unit", None),
                             min_alarm=min_val,
@@ -124,7 +125,7 @@ class SecopModuleController(Controller):
             elif secop_dtype == "bool":
                 self.add_attribute(
                     parameter_name,
-                    AttrRW(
+                    attr_cls(
                         Bool(),
                         io_ref=SecopAttributeIORef(
                             module_name=self._module_name,
@@ -140,7 +141,7 @@ class SecopModuleController(Controller):
 
                 self.add_attribute(
                     parameter_name,
-                    AttrRW(
+                    attr_cls(
                         Enum(enum_type),
                         io_ref=SecopAttributeIORef(
                             module_name=self._module_name,
@@ -153,7 +154,7 @@ class SecopModuleController(Controller):
             elif secop_dtype == "string":
                 self.add_attribute(
                     parameter_name,
-                    AttrRW(
+                    attr_cls(
                         String(),
                         io_ref=SecopAttributeIORef(
                             module_name=self._module_name,
@@ -166,7 +167,7 @@ class SecopModuleController(Controller):
             elif secop_dtype == "blob":
                 self.add_attribute(
                     parameter_name,
-                    AttrRW(
+                    attr_cls(
                         Waveform(np.uint8, shape=(datainfo["maxbytes"],)),
                         io_ref=SecopAttributeIORef(
                             module_name=self._module_name,
@@ -189,8 +190,33 @@ class SecopModuleController(Controller):
 
                 self.add_attribute(
                     parameter_name,
-                    AttrRW(
+                    attr_cls(
                         Waveform(np_inner_dtype, shape=(datainfo["maxlen"],)),
+                        io_ref=SecopAttributeIORef(
+                            module_name=self._module_name,
+                            accessible_name=parameter_name,
+                            update_period=1.0,
+                            decode=decode,
+                        ),
+                        description=parameter.get("description", ""),
+                    ),
+                )
+            elif secop_dtype == "tuple":
+                secop_dtypes = [t["type"] for t in datainfo["members"]]
+                np_dtypes = [secop_dtype_to_numpy_dtype(t) for t in secop_dtypes]
+                names = [f"e{n}" for n in range(len(datainfo["members"]))]
+
+                structured_dtype = list(zip(names, np_dtypes, strict=True))
+
+                def decode(
+                    val: list[int | float | bool], t: npt.DTypeLike = structured_dtype
+                ) -> npt.NDArray[structured_dtype]:
+                    return np.array([tuple(val)], dtype=t)
+
+                self.add_attribute(
+                    parameter_name,
+                    attr_cls(
+                        Table(structured_dtype),
                         io_ref=SecopAttributeIORef(
                             module_name=self._module_name,
                             accessible_name=parameter_name,
