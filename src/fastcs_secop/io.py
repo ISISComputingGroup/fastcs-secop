@@ -5,7 +5,7 @@ import json
 from dataclasses import dataclass, field
 from enum import Enum
 from logging import getLogger
-from typing import Any, TypeAlias
+from typing import Any, TypeAlias, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -26,9 +26,7 @@ T: TypeAlias = int | float | str | bool | Enum | npt.NDArray[Any]
 """Generic type parameter for SECoP IO."""
 
 
-async def secop_read(
-    connection: IPConnection, module_name: str, accessible_name: str
-) -> tuple[Any, dict[str, Any]]:
+async def secop_read(connection: IPConnection, module_name: str, accessible_name: str) -> str:
     """Read a SECoP accessible.
 
     Args:
@@ -51,8 +49,7 @@ async def secop_read(
     if not response.startswith(prefix):
         raise SecopError(f"Invalid response to 'read' command by SECoP device: '{response}'")
 
-    value, metadata = json.loads(response[len(prefix) :])
-    return value, metadata
+    return response[len(prefix) :]
 
 
 async def secop_change(
@@ -90,6 +87,14 @@ class SecopAttributeIORef(AttributeIORef):
     datainfo: dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass
+class SecopRawAttributeIORef(AttributeIORef):
+    """RawAttributeIO parameters for a SECoP parameter (accessible)."""
+
+    module_name: str = ""
+    accessible_name: str = ""
+
+
 class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
     """IO for a SECoP parameter of any type other than 'command'."""
 
@@ -99,27 +104,29 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
 
         self._connection = connection
 
-    def decode(self, value: Any, datainfo: dict[str, Any]) -> T:  # noqa ANN401
+    def decode(self, value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # noqa ANN401
         """Decode the transported value into a python datatype.
 
         Args:
-            value: The value to decode. This is the result of calling :py:obj:`json.loads`
-                on the raw transported bytes.
+            value: The value to decode (the raw transported string)
             datainfo: The SECoP ``datainfo`` dictionary for this attribute.
 
         Returns:
             Python datatype representation of the transported value.
 
         """
+        value, *_ = json.loads(value)
         match datainfo["type"]:
-            case "int" | "bool" | "double" | "string" | "enum":
+            case "int" | "bool" | "double" | "string":
                 return value
+            case "enum":
+                return attr.dtype(cast(int, value))
             case "scaled":
                 return value * datainfo["scale"]
             case "blob":
                 return np.frombuffer(base64.b64decode(value), dtype=np.uint8)
             case "array":
-                inner_np_dtype = secop_dtype_to_numpy_dtype(datainfo["members"]["type"])
+                inner_np_dtype = secop_dtype_to_numpy_dtype(datainfo["members"])
                 return np.array(value, dtype=inner_np_dtype)
             case "tuple":
                 structured_np_dtype = tuple_structured_dtype(datainfo)
@@ -127,7 +134,7 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
             case "struct":
                 structured_np_dtype = struct_structured_dtype(datainfo)
                 arr = np.zeros(shape=(1,), dtype=structured_np_dtype)
-                for k, v in value.items():
+                for k, v in cast(dict[str, Any], value).items():
                     arr[0][k] = v
                 return arr
             case _:
@@ -158,10 +165,10 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
     async def update(self, attr: AttrR[T, SecopAttributeIORef]) -> None:
         """Read value from device and update the value in FastCS."""
         try:
-            raw_value, _ = await secop_read(
+            raw_value = await secop_read(
                 self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
             )
-            value = self.decode(raw_value, attr.io_ref.datainfo)
+            value = self.decode(raw_value, attr.io_ref.datainfo, attr)
             await attr.update(value)
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
@@ -178,6 +185,52 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
                 attr.io_ref.module_name,
                 attr.io_ref.accessible_name,
                 encoded_value,
+            )
+        except ConnectionError:
+            # Reconnect will be attempted in a periodic scan task
+            pass
+        except Exception:
+            logger.exception("Exception during send()")
+
+
+class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
+    """Raw IO for a SECoP parameter of any type other than 'command'.
+
+    For "raw" IO, no serialization/deserialization is performed. All values are transmitted
+    to/from FastCS as strings. It is up to the client to interpret those strings correctly.
+
+    This is intended as a fallback mode for transports which cannot represent complex
+    data types.
+
+    """
+
+    def __init__(self, *, connection: IPConnection) -> None:
+        """IO for a SECoP parameter of any type other than 'command'."""
+        super().__init__()
+
+        self._connection = connection
+
+    async def update(self, attr: AttrR[str, SecopRawAttributeIORef]) -> None:
+        """Read value from device and update the value in FastCS."""
+        try:
+            raw_value = await secop_read(
+                self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
+            )
+            await attr.update(raw_value)
+        except ConnectionError:
+            # Reconnect will be attempted in a periodic scan task
+            pass
+        except Exception:
+            logger.exception("Exception during update()")
+
+    async def send(self, attr: AttrW[str, SecopRawAttributeIORef], value: str) -> None:
+        """Send a value from FastCS to the device."""
+        try:
+            await secop_change(
+                self._connection,
+                attr.io_ref.module_name,
+                attr.io_ref.accessible_name,
+                value,
             )
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task

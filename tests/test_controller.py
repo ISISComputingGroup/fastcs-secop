@@ -40,9 +40,12 @@ def test_format_string_to_prec(secop_fmt, prec):
 @pytest.mark.parametrize(
     ("secop_dtype", "np_dtype"),
     [
-        ("int", np.int32),
-        ("double", np.float64),
-        ("bool", np.uint8),
+        ({"type": "int"}, np.int32),
+        ({"type": "double"}, np.float64),
+        ({"type": "bool"}, np.uint8),
+        ({"type": "enum"}, np.int32),
+        ({"type": "string", "maxchars": 123}, "<U123"),
+        ({"type": "string"}, "<U65536"),
     ],
 )
 def test_secop_dtype_to_numpy_dtype(secop_dtype, np_dtype):
@@ -53,7 +56,7 @@ def test_invalid_secop_dtype_to_numpy_dtype():
     with pytest.raises(
         SecopError, match=r"Cannot handle SECoP dtype 'array' within array/struct/tuple"
     ):
-        secop_dtype_to_numpy_dtype("array")
+        secop_dtype_to_numpy_dtype({"type": "array"})
 
 
 async def test_ping_happy_path(controller):

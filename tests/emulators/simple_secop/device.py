@@ -118,13 +118,21 @@ class OneOfEachDtypeModule:
                 extra_datainfo={"maxlen": 512, "members": {"type": "bool"}},
             ),
             "tuple": Parameter(
-                [1, 5.678, True],
+                [1, 5.678, True, "hiya", 5],
                 desc="a tuple of int, float, bool",
                 dtype="tuple",
-                extra_datainfo={"members": [{"type": "int"}, {"type": "double"}, {"type": "bool"}]},
+                extra_datainfo={
+                    "members": [
+                        {"type": "int"},
+                        {"type": "double"},
+                        {"type": "bool"},
+                        {"type": "string"},
+                        {"type": "enum"},
+                    ]
+                },
             ),
             "struct": Parameter(
-                {"answer": 42, "pi": math.pi, "on_fire": True},
+                {"answer": 42, "pi": math.pi, "on_fire": True, "status": "chillin'", "mode": 1},
                 desc="a struct of int, float, bool",
                 dtype="struct",
                 extra_datainfo={
@@ -132,6 +140,8 @@ class OneOfEachDtypeModule:
                         "answer": {"type": "int"},
                         "pi": {"type": "double"},
                         "on_fire": {"type": "bool"},
+                        "status": {"type": "string"},
+                        "mode": {"type": "enum"},
                     }
                 },
             ),

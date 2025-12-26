@@ -13,10 +13,13 @@ from fastcs.controllers import Controller
 from fastcs.datatypes import Bool, Enum, Float, Int, String, Table, Waveform
 from fastcs.methods import scan
 
+from fastcs_secop import SecopQuirks
 from fastcs_secop._util import SecopError, format_string_to_prec, struct_structured_dtype
 from fastcs_secop.io import (
     SecopAttributeIO,
     SecopAttributeIORef,
+    SecopRawAttributeIO,
+    SecopRawAttributeIORef,
     secop_dtype_to_numpy_dtype,
     tuple_structured_dtype,
 )
@@ -33,6 +36,7 @@ class SecopModuleController(Controller):
         connection: IPConnection,
         module_name: str,
         module: dict[str, typing.Any],
+        quirks: typing.Mapping[str, SecopQuirks],
     ) -> None:
         """FastCS controller for a SECoP module.
 
@@ -45,21 +49,37 @@ class SecopModuleController(Controller):
             module: A deserialised description, in the
                 :external+secop:doc:`SECoP over-the-wire format <specification/descriptive>`,
                 of this module.
+            quirks: dict-like object of :py:obj:`~fastcs_secop.SecopQuirks` that affects how
+                attributes are processed.
 
         """
         self._module_name = module_name
         self._module = module
-        super().__init__(ios=[SecopAttributeIO(connection=connection)])
+        self._quirks = quirks
+        super().__init__(
+            ios=[
+                SecopAttributeIO(connection=connection),
+                SecopRawAttributeIO(connection=connection),
+            ]
+        )
 
     async def initialise(self) -> None:  # noqa PLR0912 TODO
         """Create attributes for all accessibles in this SECoP module."""
         for parameter_name, parameter in self._module["accessibles"].items():
+            quirks = self._quirks.get(f"{self._module_name}.{parameter_name}", SecopQuirks())
+
+            if quirks.skip:
+                continue
+
+            logger.debug("Creating attribute for parameter %s", parameter_name)
             datainfo = parameter["datainfo"]
             secop_dtype = datainfo["type"]
 
             min_val = datainfo.get("min")
             max_val = datainfo.get("max")
             scale = datainfo.get("scale")
+
+            description = parameter.get("description", "")[: quirks.max_description_length]
 
             attr_cls = AttrR if parameter.get("readonly", False) else AttrRW
 
@@ -89,7 +109,7 @@ class SecopModuleController(Controller):
                             prec=format_string_to_prec(datainfo.get("fmtstr", None)) or 6,
                         ),
                         io_ref=io_ref,
-                        description=parameter.get("description", ""),
+                        description=description,
                     ),
                 )
             elif secop_dtype == "int":
@@ -102,7 +122,7 @@ class SecopModuleController(Controller):
                             max_alarm=max_val,
                         ),
                         io_ref=io_ref,
-                        description=parameter.get("description", ""),
+                        description=description,
                     ),
                 )
             elif secop_dtype == "bool":
@@ -111,11 +131,10 @@ class SecopModuleController(Controller):
                     attr_cls(
                         Bool(),
                         io_ref=io_ref,
-                        description=parameter.get("description", ""),
+                        description=description,
                     ),
                 )
             elif secop_dtype == "enum":
-                # TODO: Bug - this doesn't work properly with PVA?
                 enum_type = enum.Enum("enum_type", datainfo["members"])
 
                 self.add_attribute(
@@ -123,7 +142,7 @@ class SecopModuleController(Controller):
                     attr_cls(
                         Enum(enum_type),
                         io_ref=io_ref,
-                        description=parameter.get("description", ""),
+                        description=description,
                     ),
                 )
             elif secop_dtype == "string":
@@ -132,7 +151,7 @@ class SecopModuleController(Controller):
                     attr_cls(
                         String(),
                         io_ref=io_ref,
-                        description=parameter.get("description", ""),
+                        description=description,
                     ),
                 )
             elif secop_dtype == "blob":
@@ -141,43 +160,91 @@ class SecopModuleController(Controller):
                     attr_cls(
                         Waveform(np.uint8, shape=(datainfo["maxbytes"],)),
                         io_ref=io_ref,
-                        description=parameter.get("description", ""),
+                        description=description,
                     ),
                 )
             elif secop_dtype == "array":
-                inner_dtype = datainfo["members"]["type"]
-                np_inner_dtype = secop_dtype_to_numpy_dtype(inner_dtype)
+                if self._quirks.get(
+                    f"{self._module_name}.{parameter_name}", SecopQuirks()
+                ).raw_array:
+                    self.add_attribute(
+                        parameter_name,
+                        attr_cls(
+                            String(65536),
+                            io_ref=SecopRawAttributeIORef(
+                                module_name=self._module_name,
+                                accessible_name=parameter_name,
+                                update_period=1.0,
+                            ),
+                            description=description,
+                        ),
+                    )
+                else:
+                    inner_dtype = datainfo["members"]
+                    np_inner_dtype = secop_dtype_to_numpy_dtype(inner_dtype)
 
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        Waveform(np_inner_dtype, shape=(datainfo["maxlen"],)),
-                        io_ref=io_ref,
-                        description=parameter.get("description", ""),
-                    ),
-                )
+                    self.add_attribute(
+                        parameter_name,
+                        attr_cls(
+                            Waveform(np_inner_dtype, shape=(datainfo["maxlen"],)),
+                            io_ref=io_ref,
+                            description=description,
+                        ),
+                    )
             elif secop_dtype == "tuple":
-                structured_dtype = tuple_structured_dtype(datainfo)
+                if self._quirks.get(
+                    f"{self._module_name}.{parameter_name}", SecopQuirks()
+                ).raw_tuple:
+                    self.add_attribute(
+                        parameter_name,
+                        attr_cls(
+                            String(65536),
+                            io_ref=SecopRawAttributeIORef(
+                                module_name=self._module_name,
+                                accessible_name=parameter_name,
+                                update_period=1.0,
+                            ),
+                            description=description,
+                        ),
+                    )
+                else:
+                    structured_dtype = tuple_structured_dtype(datainfo)
 
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        Table(structured_dtype),
-                        io_ref=io_ref,
-                        description=parameter.get("description", ""),
-                    ),
-                )
+                    self.add_attribute(
+                        parameter_name,
+                        attr_cls(
+                            Table(structured_dtype),
+                            io_ref=io_ref,
+                            description=description,
+                        ),
+                    )
             elif secop_dtype == "struct":
-                structured_dtype = struct_structured_dtype(datainfo)
+                if self._quirks.get(
+                    f"{self._module_name}.{parameter_name}", SecopQuirks()
+                ).raw_struct:
+                    self.add_attribute(
+                        parameter_name,
+                        attr_cls(
+                            String(65536),
+                            io_ref=SecopRawAttributeIORef(
+                                module_name=self._module_name,
+                                accessible_name=parameter_name,
+                                update_period=1.0,
+                            ),
+                            description=description,
+                        ),
+                    )
+                else:
+                    structured_dtype = struct_structured_dtype(datainfo)
 
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        Table(structured_dtype),
-                        io_ref=io_ref,
-                        description=parameter.get("description", ""),
-                    ),
-                )
+                    self.add_attribute(
+                        parameter_name,
+                        attr_cls(
+                            Table(structured_dtype),
+                            io_ref=io_ref,
+                            description=description,
+                        ),
+                    )
             else:
                 raise SecopError(f"Unsupported secop data type '{secop_dtype}")
 
@@ -185,16 +252,27 @@ class SecopModuleController(Controller):
 class SecopController(Controller):
     """FastCS Controller for a SECoP node."""
 
-    def __init__(self, settings: IPConnectionSettings) -> None:
+    def __init__(
+        self, settings: IPConnectionSettings, quirks: typing.Mapping[str, SecopQuirks] | None = None
+    ) -> None:
         """FastCS Controller for a SECoP node.
 
         Args:
             settings: The communication settings (e.g. IP address, port) at which
                 the SECoP node is reachable.
+            quirks: :py:obj:`dict`-like object of :py:obj:`~fastcs_secop.SecopQuirks`
+                that affects how attributes are processed.
+
+                Quirks may be applied to a module, keyed by ``module_name``, or to an
+                individual parameter, keyed by ``module_name.parameter_name``.
+
+                Hint: use a :py:obj:`~collections.defaultdict` to
+                specify quirks that apply to all attributes and modules.
 
         """
         self._ip_settings = settings
         self._connection = IPConnection()
+        self.quirks = quirks if quirks is not None else {}
 
         super().__init__()
 
@@ -292,15 +370,20 @@ class SecopController(Controller):
         description = descriptor["description"]
         equipment_id = descriptor["equipment_id"]
 
-        print(f"SECoP equipment_id = '{equipment_id}', description = '{description}'")
+        logger.info("SECoP equipment_id = '%s', description = '%s'", equipment_id, description)
+        logger.debug("descriptor = %s", json.dumps(descriptor, indent=2))
 
         modules = descriptor["modules"]
 
         for module_name, module in modules.items():
+            if self.quirks.get(module_name, SecopQuirks()).skip:
+                continue
+            logger.debug("Creating subcontroller for module %s", module_name)
             module_controller = SecopModuleController(
                 connection=self._connection,
                 module_name=module_name,
                 module=module,
+                quirks=self.quirks,
             )
             await module_controller.initialise()
             self.add_sub_controller(name=module_name, sub_controller=module_controller)

@@ -7,5 +7,6 @@ using {external+fastcs:doc}`FastCS <index>`.
 :titlesonly:
 :caption: Reference
 
+limitations
 _api
 ```

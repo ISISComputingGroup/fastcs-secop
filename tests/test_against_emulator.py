@@ -44,7 +44,8 @@ async def controller():
         settings=IPConnectionSettings(
             ip="127.0.0.1",
             port=57677,
-        )
+        ),
+        quirks={},
     )
 
     for _ in range(100):
@@ -117,14 +118,27 @@ class TestInitialState:
             (
                 "tuple",
                 np.array(
-                    [(1, 5.678, 1)], dtype=[("e0", np.int32), ("e1", np.float64), ("e2", np.uint8)]
+                    [(1, 5.678, 1, "hiya", 5)],
+                    dtype=[
+                        ("e0", np.int32),
+                        ("e1", np.float64),
+                        ("e2", np.uint8),
+                        ("e3", "<U512"),
+                        ("e4", np.int32),
+                    ],
                 ),
             ),
             (
                 "struct",
                 np.array(
-                    [(42, math.pi, 1)],
-                    dtype=[("answer", np.int32), ("pi", np.float64), ("on_fire", np.uint8)],
+                    [(42, math.pi, 1, "chillin'", 1)],
+                    dtype=[
+                        ("answer", np.int32),
+                        ("pi", np.float64),
+                        ("on_fire", np.uint8),
+                        ("status", "<U512"),
+                        ("mode", np.int32),
+                    ],
                 ),
             ),
         ],

@@ -1,6 +1,13 @@
 accessible
 accessibles
+datatype
+datatypes
 deserialised
+deserialising
+enum
+enums
 SECoP
+struct
+structs
 subcontroller
 subcontrollers
