@@ -3,19 +3,35 @@ name: sphinx
 on: [push, pull_request, workflow_call]
 
 jobs:
-  spellcheck:
-    runs-on: "windows-latest"
+  docs:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
-      - name: install requirements
-        run: pip install -e .[dev]
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install .[doc]
+      - name: Sphinx build
+        run: sphinx-build -E -a -W --keep-going doc _build
       - name: run spellcheck
         run: sphinx-build -E -a -W --keep-going -b spelling doc _build
-  call_sphinx_builder:
-    uses: ISISComputingGroup/reusable-workflows/.github/workflows/sphinx.yml@main
-    secrets: inherit
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: |
+            _build
+          if-no-files-found: error
+          retention-days: 7
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _build/
+          force_orphan: true

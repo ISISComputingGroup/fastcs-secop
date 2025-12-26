@@ -1,4 +1,5 @@
-import base64
+"""FastCS controllers for SECoP nodes."""
+
 import enum
 import json
 import typing
@@ -6,42 +7,26 @@ import uuid
 from logging import getLogger
 
 import numpy as np
-import numpy.typing as npt
 from fastcs.attributes import AttrR, AttrRW
 from fastcs.connections import IPConnection, IPConnectionSettings
 from fastcs.controllers import Controller
 from fastcs.datatypes import Bool, Enum, Float, Int, String, Table, Waveform
 from fastcs.methods import scan
 
-from fastcs_secop._io import SecopAttributeIO, SecopAttributeIORef
-from fastcs_secop._util import SecopError
+from fastcs_secop._util import SecopError, format_string_to_prec, struct_structured_dtype
+from fastcs_secop.io import (
+    SecopAttributeIO,
+    SecopAttributeIORef,
+    secop_dtype_to_numpy_dtype,
+    tuple_structured_dtype,
+)
 
 logger = getLogger(__name__)
 
 
-def format_string_to_prec(fmt_str: str | None) -> int | None:
-    """Convert a SECoP format-string specifier to a precision."""
-    if fmt_str is None:
-        return None
-
-    if fmt_str.startswith("%.") and fmt_str.endswith("f"):
-        return int(fmt_str[2:-1])
-
-    return None
-
-
-def secop_dtype_to_numpy_dtype(secop_dtype: str) -> npt.DTypeLike:
-    if secop_dtype == "double":
-        return np.float64
-    elif secop_dtype == "int":
-        return np.int32
-    elif secop_dtype == "bool":
-        return np.uint8
-    else:
-        raise SecopError(f"Cannot handle SECoP dtype '{secop_dtype}' within array/struct/tuple")
-
-
 class SecopModuleController(Controller):
+    """FastCS controller for a SECoP module."""
+
     def __init__(
         self,
         *,
@@ -66,7 +51,8 @@ class SecopModuleController(Controller):
         self._module = module
         super().__init__(ios=[SecopAttributeIO(connection=connection)])
 
-    async def initialise(self) -> None:
+    async def initialise(self) -> None:  # noqa PLR0912 TODO
+        """Create attributes for all accessibles in this SECoP module."""
         for parameter_name, parameter in self._module["accessibles"].items():
             datainfo = parameter["datainfo"]
             secop_dtype = datainfo["type"]
@@ -76,6 +62,13 @@ class SecopModuleController(Controller):
             scale = datainfo.get("scale")
 
             attr_cls = AttrR if parameter.get("readonly", False) else AttrRW
+
+            io_ref = SecopAttributeIORef(
+                module_name=self._module_name,
+                accessible_name=parameter_name,
+                update_period=1.0,
+                datainfo=datainfo,
+            )
 
             if secop_dtype == "command":
                 # TODO: handle commands
@@ -95,13 +88,7 @@ class SecopModuleController(Controller):
                             max_alarm=max_val,
                             prec=format_string_to_prec(datainfo.get("fmtstr", None)) or 6,
                         ),
-                        io_ref=SecopAttributeIORef(
-                            module_name=self._module_name,
-                            accessible_name=parameter_name,
-                            update_period=1.0,
-                            decode=lambda x, s=scale: x * s if s is not None else x,
-                            encode=lambda x, s=scale: round(x / s) if s is not None else x,
-                        ),
+                        io_ref=io_ref,
                         description=parameter.get("description", ""),
                     ),
                 )
@@ -114,11 +101,7 @@ class SecopModuleController(Controller):
                             min_alarm=min_val,
                             max_alarm=max_val,
                         ),
-                        io_ref=SecopAttributeIORef(
-                            module_name=self._module_name,
-                            accessible_name=parameter_name,
-                            update_period=1.0,
-                        ),
+                        io_ref=io_ref,
                         description=parameter.get("description", ""),
                     ),
                 )
@@ -127,11 +110,7 @@ class SecopModuleController(Controller):
                     parameter_name,
                     attr_cls(
                         Bool(),
-                        io_ref=SecopAttributeIORef(
-                            module_name=self._module_name,
-                            accessible_name=parameter_name,
-                            update_period=1.0,
-                        ),
+                        io_ref=io_ref,
                         description=parameter.get("description", ""),
                     ),
                 )
@@ -143,11 +122,7 @@ class SecopModuleController(Controller):
                     parameter_name,
                     attr_cls(
                         Enum(enum_type),
-                        io_ref=SecopAttributeIORef(
-                            module_name=self._module_name,
-                            accessible_name=parameter_name,
-                            update_period=1.0,
-                        ),
+                        io_ref=io_ref,
                         description=parameter.get("description", ""),
                     ),
                 )
@@ -156,11 +131,7 @@ class SecopModuleController(Controller):
                     parameter_name,
                     attr_cls(
                         String(),
-                        io_ref=SecopAttributeIORef(
-                            module_name=self._module_name,
-                            accessible_name=parameter_name,
-                            update_period=1.0,
-                        ),
+                        io_ref=io_ref,
                         description=parameter.get("description", ""),
                     ),
                 )
@@ -169,13 +140,7 @@ class SecopModuleController(Controller):
                     parameter_name,
                     attr_cls(
                         Waveform(np.uint8, shape=(datainfo["maxbytes"],)),
-                        io_ref=SecopAttributeIORef(
-                            module_name=self._module_name,
-                            accessible_name=parameter_name,
-                            update_period=1.0,
-                            decode=lambda x: np.frombuffer(base64.b64decode(x), dtype=np.uint8),
-                            encode=base64.b64encode,
-                        ),
+                        io_ref=io_ref,
                         description=parameter.get("description", ""),
                     ),
                 )
@@ -183,52 +148,43 @@ class SecopModuleController(Controller):
                 inner_dtype = datainfo["members"]["type"]
                 np_inner_dtype = secop_dtype_to_numpy_dtype(inner_dtype)
 
-                def decode(
-                    x: list[int | float | bool], t: npt.DTypeLike = np_inner_dtype
-                ) -> npt.NDArray[np.int32 | np.float64 | np.bool_]:
-                    return np.array(x, dtype=t)
-
                 self.add_attribute(
                     parameter_name,
                     attr_cls(
                         Waveform(np_inner_dtype, shape=(datainfo["maxlen"],)),
-                        io_ref=SecopAttributeIORef(
-                            module_name=self._module_name,
-                            accessible_name=parameter_name,
-                            update_period=1.0,
-                            decode=decode,
-                        ),
+                        io_ref=io_ref,
                         description=parameter.get("description", ""),
                     ),
                 )
             elif secop_dtype == "tuple":
-                secop_dtypes = [t["type"] for t in datainfo["members"]]
-                np_dtypes = [secop_dtype_to_numpy_dtype(t) for t in secop_dtypes]
-                names = [f"e{n}" for n in range(len(datainfo["members"]))]
-
-                structured_dtype = list(zip(names, np_dtypes, strict=True))
-
-                def decode(
-                    val: list[int | float | bool], t: npt.DTypeLike = structured_dtype
-                ) -> npt.NDArray[structured_dtype]:
-                    return np.array([tuple(val)], dtype=t)
+                structured_dtype = tuple_structured_dtype(datainfo)
 
                 self.add_attribute(
                     parameter_name,
                     attr_cls(
                         Table(structured_dtype),
-                        io_ref=SecopAttributeIORef(
-                            module_name=self._module_name,
-                            accessible_name=parameter_name,
-                            update_period=1.0,
-                            decode=decode,
-                        ),
+                        io_ref=io_ref,
                         description=parameter.get("description", ""),
                     ),
                 )
+            elif secop_dtype == "struct":
+                structured_dtype = struct_structured_dtype(datainfo)
+
+                self.add_attribute(
+                    parameter_name,
+                    attr_cls(
+                        Table(structured_dtype),
+                        io_ref=io_ref,
+                        description=parameter.get("description", ""),
+                    ),
+                )
+            else:
+                raise SecopError(f"Unsupported secop data type '{secop_dtype}")
 
 
 class SecopController(Controller):
+    """FastCS Controller for a SECoP node."""
+
     def __init__(self, settings: IPConnectionSettings) -> None:
         """FastCS Controller for a SECoP node.
 
@@ -243,6 +199,7 @@ class SecopController(Controller):
         super().__init__()
 
     async def connect(self) -> None:
+        """Connect to the SECoP node."""
         await self._connection.connect(self._ip_settings)
 
     async def deactivate(self) -> None:

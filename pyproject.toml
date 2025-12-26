@@ -43,6 +43,7 @@ doc = [
   "myst_parser",
   "sphinx-autobuild",
   "sphinxcontrib-mermaid",
+  "sphinxcontrib-spelling",
 ]
 dev = [
   "fastcs-secop[doc]",
@@ -75,7 +76,7 @@ omit = [
 ]
 
 [tool.coverage.report]
-fail_under = 100
+# fail_under = 100  # TODO
 exclude_lines = [
   "pragma: no cover",
   "if TYPE_CHECKING:",

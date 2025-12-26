@@ -9,12 +9,12 @@ from fastcs.logging import LogLevel, configure_logging
 from fastcs.transports import EpicsIOCOptions, EpicsPVATransport
 from fastcs.transports.epics.ca import EpicsCATransport
 
-from fastcs_secop._controllers import SecopController, SecopModuleController
 from fastcs_secop._util import SecopError
+from fastcs_secop.controllers import SecopController
 
 logger = getLogger(__name__)
 
-__all__ = ["SecopController", "SecopError", "SecopModuleController"]
+__all__ = ["SecopError"]
 
 
 if __name__ == "__main__":  # pragma: no cover

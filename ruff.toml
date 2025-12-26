@@ -32,7 +32,7 @@ ignore = [
     "D407",    # Missing dashed underline after section ("{name}")
     "D213",    # Incompatible with D212
     "D203",    # Incompatible with D211
-    "PLR6301"  # Too noisy
+    "PLR6301", # Too noisy
 ]
 [lint.per-file-ignores]
 "tests/*" = [

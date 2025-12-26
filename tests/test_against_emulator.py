@@ -12,7 +12,7 @@ from fastcs.attributes import AttrR
 from fastcs.connections import IPConnectionSettings
 from fastcs.logging import LogLevel, configure_logging
 
-from fastcs_secop import SecopController
+from fastcs_secop.controllers import SecopController
 
 configure_logging(level=LogLevel.TRACE)
 
@@ -118,6 +118,13 @@ class TestInitialState:
                 "tuple",
                 np.array(
                     [(1, 5.678, 1)], dtype=[("e0", np.int32), ("e1", np.float64), ("e2", np.uint8)]
+                ),
+            ),
+            (
+                "struct",
+                np.array(
+                    [(42, math.pi, 1)],
+                    dtype=[("answer", np.int32), ("pi", np.float64), ("on_fire", np.uint8)],
                 ),
             ),
         ],

@@ -22,6 +22,12 @@ release = "0.1"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 nitpicky = True
+nitpick_ignore_regex = [
+    ("py:class", r"^.*\.T$"),
+    ("py:obj", r"^.*\.T$"),
+    ("py:class", r"^.*\.T.*_co$"),
+    ("py:obj", r"^.*\.T.*_co$"),
+]
 
 myst_enable_extensions = ["dollarmath", "strikethrough", "colon_fence", "attrs_block"]
 suppress_warnings = ["myst.strikethrough"]
@@ -59,12 +65,10 @@ html_context = {
 }
 
 html_theme = "sphinx_rtd_theme"
-html_logo = "logo.svg"
 html_theme_options = {
     "logo_only": False,
     "style_nav_header_background": "#343131",
 }
-html_favicon = "favicon.svg"
 html_static_path = ["_static"]
 html_css_files = [
     "css/custom.css",
@@ -84,4 +88,5 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "secop": ("https://sampleenvironment.github.io/secop-site/", None),
     "fastcs": ("https://diamondlightsource.github.io/FastCS/main/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
 }

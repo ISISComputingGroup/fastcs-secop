@@ -5,7 +5,7 @@ import pytest
 from fastcs.connections import IPConnectionSettings
 
 from fastcs_secop import SecopError
-from fastcs_secop._controllers import (
+from fastcs_secop.controllers import (
     SecopController,
     format_string_to_prec,
     secop_dtype_to_numpy_dtype,

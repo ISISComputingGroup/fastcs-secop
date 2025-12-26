@@ -123,6 +123,18 @@ class OneOfEachDtypeModule:
                 dtype="tuple",
                 extra_datainfo={"members": [{"type": "int"}, {"type": "double"}, {"type": "bool"}]},
             ),
+            "struct": Parameter(
+                {"answer": 42, "pi": math.pi, "on_fire": True},
+                desc="a struct of int, float, bool",
+                dtype="struct",
+                extra_datainfo={
+                    "members": {
+                        "answer": {"type": "int"},
+                        "pi": {"type": "double"},
+                        "on_fire": {"type": "bool"},
+                    }
+                },
+            ),
         }
 
         self.description = "a module with one accessible of each possible dtype"
