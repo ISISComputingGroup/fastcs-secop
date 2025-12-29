@@ -1,6 +1,7 @@
 """Implementation of IO for SECoP accessibles."""
 
 import base64
+import enum
 import json
 from dataclasses import dataclass, field
 from enum import Enum
@@ -22,7 +23,7 @@ from fastcs_secop._util import (
 logger = getLogger(__name__)
 
 
-T: TypeAlias = int | float | str | bool | Enum | npt.NDArray[Any]
+T: TypeAlias = int | float | str | bool | Enum | npt.NDArray[Any]  # noqa: UP040 (sphinx doesn't like it)
 """Generic type parameter for SECoP IO."""
 
 
@@ -149,16 +150,22 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
 
         """
         match datainfo["type"]:
-            case "int" | "bool" | "double" | "string" | "enum":
+            case "int" | "bool" | "double" | "string":
                 return json.dumps(value)
+            case "enum":
+                assert isinstance(value, enum.Enum)
+                return json.dumps(value.value)
             case "scaled":
                 return json.dumps(round(value / datainfo["scale"]))
             case "blob":
                 assert isinstance(value, np.ndarray)
                 return json.dumps(base64.b64encode("".join(chr(c) for c in value).encode("utf-8")))
-            case "array" | "tuple":
+            case "array":
                 assert isinstance(value, np.ndarray)
                 return json.dumps(value.tolist())
+            case "tuple" | "struct":
+                assert isinstance(value, np.ndarray)
+                return json.dumps(value.tolist()[0])
             case _:
                 raise SecopError(f"Cannot handle SECoP dtype '{datainfo['type']}'")
 
@@ -186,6 +193,8 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
                 attr.io_ref.accessible_name,
                 encoded_value,
             )
+            # Ugly, but I can't find a public alternative...
+            await attr._call_sync_setpoint_callbacks(value)  # noqa: SLF001
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass
@@ -216,7 +225,9 @@ class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
             raw_value = await secop_read(
                 self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
             )
-            await attr.update(raw_value)
+            # Get rid of timestamp and other specifiers, we just want the value
+            value, *_ = json.loads(raw_value)
+            await attr.update(json.dumps(value))
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass
@@ -232,6 +243,8 @@ class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
                 attr.io_ref.accessible_name,
                 value,
             )
+            # Ugly, but I can't find a public alternative...
+            await attr._call_sync_setpoint_callbacks(value)  # noqa: SLF001
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass

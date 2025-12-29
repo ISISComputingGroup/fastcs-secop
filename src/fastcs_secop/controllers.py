@@ -36,7 +36,7 @@ class SecopModuleController(Controller):
         connection: IPConnection,
         module_name: str,
         module: dict[str, typing.Any],
-        quirks: typing.Mapping[str, SecopQuirks],
+        quirks: SecopQuirks,
     ) -> None:
         """FastCS controller for a SECoP module.
 
@@ -49,8 +49,8 @@ class SecopModuleController(Controller):
             module: A deserialised description, in the
                 :external+secop:doc:`SECoP over-the-wire format <specification/descriptive>`,
                 of this module.
-            quirks: dict-like object of :py:obj:`~fastcs_secop.SecopQuirks` that affects how
-                attributes are processed.
+            quirks: Affects how attributes are processed.
+                See :py:obj:`~fastcs_secop.SecopQuirks` for details.
 
         """
         self._module_name = module_name
@@ -66,9 +66,7 @@ class SecopModuleController(Controller):
     async def initialise(self) -> None:  # noqa PLR0912 TODO
         """Create attributes for all accessibles in this SECoP module."""
         for parameter_name, parameter in self._module["accessibles"].items():
-            quirks = self._quirks.get(f"{self._module_name}.{parameter_name}", SecopQuirks())
-
-            if quirks.skip:
+            if (self._module_name, parameter_name) in self._quirks.skip_accessibles:
                 continue
 
             logger.debug("Creating attribute for parameter %s", parameter_name)
@@ -79,15 +77,21 @@ class SecopModuleController(Controller):
             max_val = datainfo.get("max")
             scale = datainfo.get("scale")
 
-            description = parameter.get("description", "")[: quirks.max_description_length]
+            description = parameter.get("description", "")[: self._quirks.max_description_length]
 
             attr_cls = AttrR if parameter.get("readonly", False) else AttrRW
 
             io_ref = SecopAttributeIORef(
                 module_name=self._module_name,
                 accessible_name=parameter_name,
-                update_period=1.0,
+                update_period=self._quirks.update_period,
                 datainfo=datainfo,
+            )
+
+            raw_io_ref = SecopRawAttributeIORef(
+                module_name=self._module_name,
+                accessible_name=parameter_name,
+                update_period=self._quirks.update_period,
             )
 
             if secop_dtype == "command":
@@ -164,18 +168,15 @@ class SecopModuleController(Controller):
                     ),
                 )
             elif secop_dtype == "array":
-                if self._quirks.get(
-                    f"{self._module_name}.{parameter_name}", SecopQuirks()
-                ).raw_array:
+                if (
+                    self._quirks.raw_array
+                    or (self._module_name, parameter_name) in self._quirks.raw_accessibles
+                ):
                     self.add_attribute(
                         parameter_name,
                         attr_cls(
                             String(65536),
-                            io_ref=SecopRawAttributeIORef(
-                                module_name=self._module_name,
-                                accessible_name=parameter_name,
-                                update_period=1.0,
-                            ),
+                            io_ref=raw_io_ref,
                             description=description,
                         ),
                     )
@@ -192,18 +193,15 @@ class SecopModuleController(Controller):
                         ),
                     )
             elif secop_dtype == "tuple":
-                if self._quirks.get(
-                    f"{self._module_name}.{parameter_name}", SecopQuirks()
-                ).raw_tuple:
+                if (
+                    self._quirks.raw_tuple
+                    or (self._module_name, parameter_name) in self._quirks.raw_accessibles
+                ):
                     self.add_attribute(
                         parameter_name,
                         attr_cls(
                             String(65536),
-                            io_ref=SecopRawAttributeIORef(
-                                module_name=self._module_name,
-                                accessible_name=parameter_name,
-                                update_period=1.0,
-                            ),
+                            io_ref=raw_io_ref,
                             description=description,
                         ),
                     )
@@ -219,18 +217,15 @@ class SecopModuleController(Controller):
                         ),
                     )
             elif secop_dtype == "struct":
-                if self._quirks.get(
-                    f"{self._module_name}.{parameter_name}", SecopQuirks()
-                ).raw_struct:
+                if (
+                    self._quirks.raw_struct
+                    or (self._module_name, parameter_name) in self._quirks.raw_accessibles
+                ):
                     self.add_attribute(
                         parameter_name,
                         attr_cls(
                             String(65536),
-                            io_ref=SecopRawAttributeIORef(
-                                module_name=self._module_name,
-                                accessible_name=parameter_name,
-                                update_period=1.0,
-                            ),
+                            io_ref=raw_io_ref,
                             description=description,
                         ),
                     )
@@ -252,9 +247,7 @@ class SecopModuleController(Controller):
 class SecopController(Controller):
     """FastCS Controller for a SECoP node."""
 
-    def __init__(
-        self, settings: IPConnectionSettings, quirks: typing.Mapping[str, SecopQuirks] | None = None
-    ) -> None:
+    def __init__(self, settings: IPConnectionSettings, quirks: SecopQuirks | None = None) -> None:
         """FastCS Controller for a SECoP node.
 
         Args:
@@ -263,16 +256,10 @@ class SecopController(Controller):
             quirks: :py:obj:`dict`-like object of :py:obj:`~fastcs_secop.SecopQuirks`
                 that affects how attributes are processed.
 
-                Quirks may be applied to a module, keyed by ``module_name``, or to an
-                individual parameter, keyed by ``module_name.parameter_name``.
-
-                Hint: use a :py:obj:`~collections.defaultdict` to
-                specify quirks that apply to all attributes and modules.
-
         """
         self._ip_settings = settings
         self._connection = IPConnection()
-        self.quirks = quirks if quirks is not None else {}
+        self.quirks = quirks or SecopQuirks()
 
         super().__init__()
 
@@ -376,7 +363,7 @@ class SecopController(Controller):
         modules = descriptor["modules"]
 
         for module_name, module in modules.items():
-            if self.quirks.get(module_name, SecopQuirks()).skip:
+            if module_name in self.quirks.skip_modules:
                 continue
             logger.debug("Creating subcontroller for module %s", module_name)
             module_controller = SecopModuleController(

@@ -5,6 +5,14 @@ using {external+fastcs:doc}`FastCS <index>`.
 
 ```{toctree}
 :titlesonly:
+:caption: Transports
+:glob:
+
+transports/*
+```
+
+```{toctree}
+:titlesonly:
 :caption: Reference
 
 limitations

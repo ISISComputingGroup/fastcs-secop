@@ -9,14 +9,14 @@
 import os
 import sys
 
-import fastcs_secop  # noqa: F401
+from fastcs_secop.version import version
 
 sys.path.insert(0, os.path.abspath("../src"))
 
 project = "fastcs-secop"
 copyright = ""
 author = "ISIS Experiment Controls"
-release = "0.1"
+release = version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

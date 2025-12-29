@@ -10,19 +10,19 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.version }}
       - name: install requirements
-        run: pip install -e .[dev]
+        run: uv sync --extra dev
       - name: run ruff check
-        run: python -m ruff check
-      - name: run ruff format
-        run: python -m ruff format --check
+        run: uv run ruff check
+      - name: run ruff format --check
+        run: uv run ruff format --check
       - name: run pyright
-        run: python -m pyright
+        run: uv run pyright
       - name: run pytest
-        run: python -m pytest
+        run: uv run pytest
   results:
     if: ${{ always() }}
     runs-on: ubuntu-latest

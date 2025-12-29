@@ -7,7 +7,7 @@ name = "fastcs-secop"  # REQUIRED, is the only field that cannot be marked as dy
 dynamic = ["version"]
 description = "SECoP device support using FastCS"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license-files = ["LICENSE"]
 
 authors = [
@@ -18,22 +18,16 @@ maintainers = [
 ]
 
 classifiers = [
-  # How mature is this project? Common values are
-  #   3 - Alpha
-  #   4 - Beta
-  #   5 - Production/Stable
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
 
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3 :: Only",
 ]
 
 dependencies = [
-  "fastcs[epics] @ git+https://github.com/Tom-Willemsen/FastCS@guard_methods_that_dont_work_on_windows",
+  "fastcs @ git+https://github.com/Tom-Willemsen/FastCS@guard_methods_that_dont_work_on_windows",
 ]
 
 [project.optional-dependencies]
@@ -88,7 +82,7 @@ exclude_lines = [
 directory = "coverage_html_report"
 
 [tool.pyright]
-include = ["src"]
+include = ["src", "examples"]
 reportConstantRedefinition = true
 reportDeprecated = true
 reportInconsistentConstructor = true
