@@ -16,6 +16,7 @@ EPICS PVA transport supports the following {external+secop:doc}`SECoP data types
 - tuple of double/int/bool/{ref}`enum* <limitations_enum>`/string elements
 - struct of double/int/bool/{ref}`enum* <limitations_enum>`/string elements
 - matrix
+- command (if arguments and return values are empty or one of the above types)
 
 Other data types can only be read in 'raw' mode.
 

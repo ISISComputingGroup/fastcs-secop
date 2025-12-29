@@ -1,8 +1,10 @@
 accessible
 accessibles
 bool
+datainfo
 datatype
 datatypes
+deserialisation
 deserialised
 deserialising
 enum

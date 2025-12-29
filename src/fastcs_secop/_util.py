@@ -1,9 +1,11 @@
+import enum
 from collections.abc import Collection
 from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from fastcs.datatypes import Bool, DataType, Enum, Float, Int, String, Table, Waveform
 
 
 @dataclass(frozen=True)
@@ -74,7 +76,7 @@ def secop_dtype_to_numpy_dtype(secop_datainfo: dict[str, Any]) -> npt.DTypeLike:
     elif dtype == "int":
         return np.int32
     elif dtype == "bool":
-        return np.uint8
+        return np.uint8  # CA transport doesn't support bool_
     elif dtype == "enum":
         return np.int32
     elif dtype == "string":
@@ -98,3 +100,61 @@ def struct_structured_dtype(datainfo: dict[str, Any]) -> list[tuple[str, npt.DTy
         (k, secop_dtype_to_numpy_dtype(v)) for k, v in datainfo["members"].items()
     ]
     return structured_np_dtype
+
+
+def secop_datainfo_to_fastcs_dtype(datainfo: dict[str, Any], raw: bool = False) -> DataType[Any]:
+    """Convert a SECoP datainfo dictionary to a FastCS data type.
+
+    Args:
+        datainfo: SECoP datainfo dictionary.
+        raw: whether to read this parameter in 'raw' mode.
+
+    """
+    if raw:
+        return String()
+
+    min_val = datainfo.get("min")
+    max_val = datainfo.get("max")
+
+    match datainfo["type"]:
+        case "double" | "scaled":
+            scale = datainfo.get("scale")
+
+            if min_val is not None and scale is not None:
+                min_val *= scale
+            if max_val is not None and scale is not None:
+                max_val *= scale
+
+            return Float(
+                units=datainfo.get("unit", None),
+                min_alarm=min_val,
+                max_alarm=max_val,
+                prec=format_string_to_prec(datainfo.get("fmtstr", None)),  # type: ignore
+            )
+        case "int":
+            return Int(
+                units=datainfo.get("unit", None),
+                min_alarm=min_val,
+                max_alarm=max_val,
+            )
+        case "bool":
+            return Bool()
+        case "enum":
+            enum_type = enum.Enum("enum_type", datainfo["members"])
+            return Enum(enum_type)
+        case "string":
+            return String()
+        case "blob":
+            return Waveform(np.uint8, shape=(datainfo["maxbytes"],))
+        case "array":
+            inner_dtype = datainfo["members"]
+            np_inner_dtype = secop_dtype_to_numpy_dtype(inner_dtype)
+            return Waveform(np_inner_dtype, shape=(datainfo["maxlen"],))
+        case "tuple":
+            structured_dtype = tuple_structured_dtype(datainfo)
+            return Table(structured_dtype)
+        case "struct":
+            structured_dtype = struct_structured_dtype(datainfo)
+            return Table(structured_dtype)
+        case _:
+            raise SecopError(f"Invalid SECoP dtype for FastCS attribute: {datainfo['type']}")

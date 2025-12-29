@@ -1,30 +1,108 @@
 """FastCS controllers for SECoP nodes."""
 
-import enum
-import json
 import typing
 import uuid
 from logging import getLogger
 
-import numpy as np
+import orjson
 from fastcs.attributes import AttrR, AttrRW
 from fastcs.connections import IPConnection, IPConnectionSettings
 from fastcs.controllers import Controller
-from fastcs.datatypes import Bool, Enum, Float, Int, String, Table, Waveform
-from fastcs.methods import scan
+from fastcs.methods import command, scan
 
 from fastcs_secop import SecopQuirks
-from fastcs_secop._util import SecopError, format_string_to_prec, struct_structured_dtype
+from fastcs_secop._util import (
+    SecopError,
+    secop_datainfo_to_fastcs_dtype,
+)
 from fastcs_secop.io import (
     SecopAttributeIO,
     SecopAttributeIORef,
     SecopRawAttributeIO,
     SecopRawAttributeIORef,
-    secop_dtype_to_numpy_dtype,
-    tuple_structured_dtype,
+    decode,
+    encode,
 )
 
 logger = getLogger(__name__)
+
+
+class SecopCommandController(Controller):
+    """SECoP command controller."""
+
+    def __init__(
+        self,
+        *,
+        connection: IPConnection,
+        module_name: str,
+        command_name: str,
+        datainfo: dict[str, typing.Any],
+    ) -> None:
+        """Subcontroller for a SECoP command.
+
+        Args:
+            connection: The connection to use.
+            module_name: The module in which this command is defined.
+            command_name: The name of the command.
+            datainfo: The datainfo dictionary for this command.
+
+        """
+        super().__init__()
+
+        self.connection = connection
+        self.module_name = module_name
+        self.command_name = command_name
+        self.datainfo = datainfo
+
+    async def initialise(self) -> None:
+        """Initialise the command controller.
+
+        This will set up PVs for ``Args`` and ``Result`` (if they have a type).
+        """
+        if self.datainfo.get("argument") is not None:
+            args_type = secop_datainfo_to_fastcs_dtype(self.datainfo["argument"])
+        else:
+            args_type = None
+
+        if self.datainfo.get("result") is not None:
+            result_type = secop_datainfo_to_fastcs_dtype(self.datainfo["result"])
+        else:
+            result_type = None
+
+        if args_type is not None:
+            self.args = AttrRW(description="args", datatype=args_type)
+        else:
+            self.args = None
+
+        if result_type is not None:
+            self.result = AttrR(description="result", datatype=result_type)
+        else:
+            self.result = None
+
+    @command()
+    async def execute(self) -> None:
+        """Execute the command."""
+        prefix = f"do {self.module_name}:{self.command_name}"
+        response_prefix = f"done {self.module_name}:{self.command_name}"
+
+        if self.args is not None:
+            cmd = f"{prefix} {encode(self.args.get(), self.datainfo['argument'])}\n"
+        else:
+            cmd = f"{prefix}\n"
+
+        logger.debug("Sending command: '%s'", cmd)
+        response = await self.connection.send_query(cmd)
+        logger.debug("Response: '%s'", response)
+
+        response = response.strip()
+        if not response.startswith(response_prefix):
+            logger.warning("command '%s' failed (response='%s')", prefix, response)
+            return
+
+        response = response[len(response_prefix) :].strip()
+
+        if self.result is not None:
+            await self.result.update(decode(response, self.datainfo["result"], self.result))
 
 
 class SecopModuleController(Controller):
@@ -56,6 +134,8 @@ class SecopModuleController(Controller):
         self._module_name = module_name
         self._module = module
         self._quirks = quirks
+        self._connection = connection
+
         super().__init__(
             ios=[
                 SecopAttributeIO(connection=connection),
@@ -63,7 +143,15 @@ class SecopModuleController(Controller):
             ]
         )
 
-    async def initialise(self) -> None:  # noqa PLR0912 TODO
+    def _is_raw(self, parameter_name: str, datainfo: dict[str, typing.Any]) -> bool:
+        return (
+            ((self._module_name, parameter_name) in self._quirks.raw_accessibles)
+            or (datainfo["type"] == "array" and self._quirks.raw_array)
+            or (datainfo["type"] == "tuple" and self._quirks.raw_tuple)
+            or (datainfo["type"] == "struct" and self._quirks.raw_struct)
+        )
+
+    async def initialise(self) -> None:
         """Create attributes for all accessibles in this SECoP module."""
         for parameter_name, parameter in self._module["accessibles"].items():
             if (self._module_name, parameter_name) in self._quirks.skip_accessibles:
@@ -71,177 +159,47 @@ class SecopModuleController(Controller):
 
             logger.debug("Creating attribute for parameter %s", parameter_name)
             datainfo = parameter["datainfo"]
-            secop_dtype = datainfo["type"]
-
-            min_val = datainfo.get("min")
-            max_val = datainfo.get("max")
-            scale = datainfo.get("scale")
 
             description = parameter.get("description", "")[: self._quirks.max_description_length]
 
             attr_cls = AttrR if parameter.get("readonly", False) else AttrRW
 
-            io_ref = SecopAttributeIORef(
-                module_name=self._module_name,
-                accessible_name=parameter_name,
-                update_period=self._quirks.update_period,
-                datainfo=datainfo,
-            )
+            raw = self._is_raw(parameter_name, datainfo)
 
-            raw_io_ref = SecopRawAttributeIORef(
-                module_name=self._module_name,
-                accessible_name=parameter_name,
-                update_period=self._quirks.update_period,
-            )
-
-            if secop_dtype == "command":
-                # TODO: handle commands
-                pass
-            elif secop_dtype in {"double", "scaled"}:
-                if min_val is not None and scale is not None:
-                    min_val *= scale
-                if max_val is not None and scale is not None:
-                    max_val *= scale
-
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        Float(
-                            units=datainfo.get("unit", None),
-                            min_alarm=min_val,
-                            max_alarm=max_val,
-                            prec=format_string_to_prec(datainfo.get("fmtstr", None)) or 6,
-                        ),
-                        io_ref=io_ref,
-                        description=description,
-                    ),
+            if raw:
+                io_ref = SecopRawAttributeIORef(
+                    module_name=self._module_name,
+                    accessible_name=parameter_name,
+                    update_period=self._quirks.update_period,
                 )
-            elif secop_dtype == "int":
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        Int(
-                            units=datainfo.get("unit", None),
-                            min_alarm=min_val,
-                            max_alarm=max_val,
-                        ),
-                        io_ref=io_ref,
-                        description=description,
-                    ),
-                )
-            elif secop_dtype == "bool":
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        Bool(),
-                        io_ref=io_ref,
-                        description=description,
-                    ),
-                )
-            elif secop_dtype == "enum":
-                enum_type = enum.Enum("enum_type", datainfo["members"])
-
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        Enum(enum_type),
-                        io_ref=io_ref,
-                        description=description,
-                    ),
-                )
-            elif secop_dtype == "string":
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        String(),
-                        io_ref=io_ref,
-                        description=description,
-                    ),
-                )
-            elif secop_dtype == "blob":
-                self.add_attribute(
-                    parameter_name,
-                    attr_cls(
-                        Waveform(np.uint8, shape=(datainfo["maxbytes"],)),
-                        io_ref=io_ref,
-                        description=description,
-                    ),
-                )
-            elif secop_dtype == "array":
-                if (
-                    self._quirks.raw_array
-                    or (self._module_name, parameter_name) in self._quirks.raw_accessibles
-                ):
-                    self.add_attribute(
-                        parameter_name,
-                        attr_cls(
-                            String(65536),
-                            io_ref=raw_io_ref,
-                            description=description,
-                        ),
-                    )
-                else:
-                    inner_dtype = datainfo["members"]
-                    np_inner_dtype = secop_dtype_to_numpy_dtype(inner_dtype)
-
-                    self.add_attribute(
-                        parameter_name,
-                        attr_cls(
-                            Waveform(np_inner_dtype, shape=(datainfo["maxlen"],)),
-                            io_ref=io_ref,
-                            description=description,
-                        ),
-                    )
-            elif secop_dtype == "tuple":
-                if (
-                    self._quirks.raw_tuple
-                    or (self._module_name, parameter_name) in self._quirks.raw_accessibles
-                ):
-                    self.add_attribute(
-                        parameter_name,
-                        attr_cls(
-                            String(65536),
-                            io_ref=raw_io_ref,
-                            description=description,
-                        ),
-                    )
-                else:
-                    structured_dtype = tuple_structured_dtype(datainfo)
-
-                    self.add_attribute(
-                        parameter_name,
-                        attr_cls(
-                            Table(structured_dtype),
-                            io_ref=io_ref,
-                            description=description,
-                        ),
-                    )
-            elif secop_dtype == "struct":
-                if (
-                    self._quirks.raw_struct
-                    or (self._module_name, parameter_name) in self._quirks.raw_accessibles
-                ):
-                    self.add_attribute(
-                        parameter_name,
-                        attr_cls(
-                            String(65536),
-                            io_ref=raw_io_ref,
-                            description=description,
-                        ),
-                    )
-                else:
-                    structured_dtype = struct_structured_dtype(datainfo)
-
-                    self.add_attribute(
-                        parameter_name,
-                        attr_cls(
-                            Table(structured_dtype),
-                            io_ref=io_ref,
-                            description=description,
-                        ),
-                    )
             else:
-                raise SecopError(f"Unsupported secop data type '{secop_dtype}")
+                io_ref = SecopAttributeIORef(
+                    module_name=self._module_name,
+                    accessible_name=parameter_name,
+                    update_period=self._quirks.update_period,
+                    datainfo=datainfo,
+                )
+
+            if datainfo["type"] == "command":
+                command_controller = SecopCommandController(
+                    module_name=self._module_name,
+                    command_name=parameter_name,
+                    connection=self._connection,
+                    datainfo=datainfo,
+                )
+                self.add_sub_controller(parameter_name, command_controller)
+                await command_controller.initialise()
+            else:
+                fastcs_type = secop_datainfo_to_fastcs_dtype(datainfo=datainfo, raw=raw)
+
+                self.add_attribute(
+                    parameter_name,
+                    attr_cls(
+                        fastcs_type,
+                        io_ref=io_ref,
+                        description=description,
+                    ),
+                )
 
 
 class SecopController(Controller):
@@ -253,8 +211,7 @@ class SecopController(Controller):
         Args:
             settings: The communication settings (e.g. IP address, port) at which
                 the SECoP node is reachable.
-            quirks: :py:obj:`dict`-like object of :py:obj:`~fastcs_secop.SecopQuirks`
-                that affects how attributes are processed.
+            quirks: :py:obj:`~fastcs_secop.SecopQuirks` that affects how attributes are processed.
 
         """
         self._ip_settings = settings
@@ -352,13 +309,13 @@ class SecopController(Controller):
         if not descriptor.startswith("describing . "):
             raise SecopError(f"Invalid response to 'describe': '{descriptor}'.")
 
-        descriptor = json.loads(descriptor[len("describing . ") :])
+        descriptor = orjson.loads(descriptor[len("describing . ") :])
 
         description = descriptor["description"]
         equipment_id = descriptor["equipment_id"]
 
         logger.info("SECoP equipment_id = '%s', description = '%s'", equipment_id, description)
-        logger.debug("descriptor = %s", json.dumps(descriptor, indent=2))
+        logger.debug("descriptor = %s", orjson.dumps(descriptor, option=orjson.OPT_INDENT_2))
 
         modules = descriptor["modules"]
 

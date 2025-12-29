@@ -28,6 +28,7 @@ classifiers = [
 
 dependencies = [
   "fastcs @ git+https://github.com/Tom-Willemsen/FastCS@guard_methods_that_dont_work_on_windows",
+  "orjson",
 ]
 
 [project.optional-dependencies]

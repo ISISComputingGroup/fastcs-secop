@@ -51,3 +51,5 @@ ignore = [
 
 [lint.pylint]
 max-args = 8
+max-returns = 10
+max-branches = 15

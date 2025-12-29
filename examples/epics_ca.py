@@ -23,13 +23,21 @@ if __name__ == "__main__":
     epics_options = EpicsIOCOptions(pv_prefix=f"TE:{socket.gethostname().upper()}:SECOP")
     epics_ca = EpicsCATransport(epicsca=epics_options)
 
-    quirks = SecopQuirks(raw_tuple=True, raw_struct=True, max_description_length=40)
+    quirks = SecopQuirks(
+        raw_tuple=True,
+        raw_struct=True,
+        max_description_length=40,
+        raw_accessibles=[
+            ("valve_controller", "_domains_to_extract"),
+            ("valve_controller", "_terminal_values"),
+        ],
+    )
 
     LEWIS = 57677
     DOCKER_GASFLOW = 10801
 
     controller = SecopController(
-        settings=IPConnectionSettings(ip="127.0.0.1", port=LEWIS),
+        settings=IPConnectionSettings(ip="127.0.0.1", port=DOCKER_GASFLOW),
         quirks=quirks,
     )
 

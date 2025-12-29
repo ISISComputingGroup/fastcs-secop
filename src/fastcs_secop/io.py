@@ -2,7 +2,6 @@
 
 import base64
 import enum
-import json
 from dataclasses import dataclass, field
 from enum import Enum
 from logging import getLogger
@@ -10,6 +9,7 @@ from typing import Any, TypeAlias, cast
 
 import numpy as np
 import numpy.typing as npt
+import orjson
 from fastcs.attributes import AttributeIO, AttributeIORef, AttrR, AttrW
 from fastcs.connections import IPConnection
 
@@ -36,7 +36,7 @@ async def secop_read(connection: IPConnection, module_name: str, accessible_name
         accessible_name: Accessible name
 
     Returns:
-        The result of reading from the accessible, after calling :py:obj:`json.loads`.
+        The result of reading from the accessible, after JSON deserialisation.
 
     Raises:
         SecopError: If a valid response was not received
@@ -96,6 +96,78 @@ class SecopRawAttributeIORef(AttributeIORef):
     accessible_name: str = ""
 
 
+def decode(value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # noqa ANN401
+    """Decode the transported value into a python datatype.
+
+    Args:
+        value: The value to decode (the raw transported string)
+        datainfo: The SECoP ``datainfo`` dictionary for this attribute.
+
+    Returns:
+        Python datatype representation of the transported value.
+
+    """
+    value, *_ = orjson.loads(value)
+    match datainfo["type"]:
+        case "enum":
+            return attr.dtype(cast(int, value))
+        case "scaled":
+            return value * datainfo["scale"]
+        case "blob":
+            return np.frombuffer(base64.b64decode(value), dtype=np.uint8)
+        case "array":
+            inner_np_dtype = secop_dtype_to_numpy_dtype(datainfo["members"])
+            return np.array(value, dtype=inner_np_dtype)
+        case "tuple":
+            structured_np_dtype = tuple_structured_dtype(datainfo)
+            return np.array([tuple(value)], dtype=structured_np_dtype)
+        case "struct":
+            structured_np_dtype = struct_structured_dtype(datainfo)
+            arr = np.zeros(shape=(1,), dtype=structured_np_dtype)
+            for k, v in cast(dict[str, Any], value).items():
+                arr[0][k] = v
+            return arr
+        case _:
+            return value
+
+
+def encode(value: T, datainfo: dict[str, Any]) -> str:
+    """Encode the transported value to a string for transport.
+
+    Args:
+        value: The value to encode.
+        datainfo: The SECoP ``datainfo`` dictionary for this attribute.
+
+    """
+    match datainfo["type"]:
+        case "int" | "bool" | "double" | "string":
+            return orjson.dumps(value).decode()
+        case "enum":
+            assert isinstance(value, enum.Enum)
+            return orjson.dumps(value.value).decode()
+        case "scaled":
+            return orjson.dumps(round(value / datainfo["scale"])).decode()
+        case "blob":
+            assert isinstance(value, np.ndarray)
+            return orjson.dumps(
+                base64.b64encode("".join(chr(c) for c in value).encode("utf-8"))
+            ).decode()
+        case "array":
+            return orjson.dumps(value, option=orjson.OPT_SERIALIZE_NUMPY).decode()
+        case "tuple":
+            assert isinstance(value, np.ndarray)
+            return orjson.dumps(value[0], option=orjson.OPT_SERIALIZE_NUMPY).decode()
+        case "struct":
+            assert isinstance(value, np.ndarray)
+            ans = {}
+            assert value.dtype.names is not None
+            for name in value.dtype.names:
+                ans[name] = value[name][0]
+            return orjson.dumps(ans, option=orjson.OPT_SERIALIZE_NUMPY).decode()
+        case _:
+            raise SecopError(f"Cannot handle SECoP dtype '{datainfo['type']}'")
+
+
 class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
     """IO for a SECoP parameter of any type other than 'command'."""
 
@@ -105,77 +177,13 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
 
         self._connection = connection
 
-    def decode(self, value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # noqa ANN401
-        """Decode the transported value into a python datatype.
-
-        Args:
-            value: The value to decode (the raw transported string)
-            datainfo: The SECoP ``datainfo`` dictionary for this attribute.
-
-        Returns:
-            Python datatype representation of the transported value.
-
-        """
-        value, *_ = json.loads(value)
-        match datainfo["type"]:
-            case "int" | "bool" | "double" | "string":
-                return value
-            case "enum":
-                return attr.dtype(cast(int, value))
-            case "scaled":
-                return value * datainfo["scale"]
-            case "blob":
-                return np.frombuffer(base64.b64decode(value), dtype=np.uint8)
-            case "array":
-                inner_np_dtype = secop_dtype_to_numpy_dtype(datainfo["members"])
-                return np.array(value, dtype=inner_np_dtype)
-            case "tuple":
-                structured_np_dtype = tuple_structured_dtype(datainfo)
-                return np.array([tuple(value)], dtype=structured_np_dtype)
-            case "struct":
-                structured_np_dtype = struct_structured_dtype(datainfo)
-                arr = np.zeros(shape=(1,), dtype=structured_np_dtype)
-                for k, v in cast(dict[str, Any], value).items():
-                    arr[0][k] = v
-                return arr
-            case _:
-                raise SecopError(f"Cannot handle SECoP dtype '{datainfo['type']}'")
-
-    def encode(self, value: T, datainfo: dict[str, Any]) -> str:
-        """Encode the transported value to a string for transport.
-
-        Args:
-            value: The value to encode.
-            datainfo: The SECoP ``datainfo`` dictionary for this attribute.
-
-        """
-        match datainfo["type"]:
-            case "int" | "bool" | "double" | "string":
-                return json.dumps(value)
-            case "enum":
-                assert isinstance(value, enum.Enum)
-                return json.dumps(value.value)
-            case "scaled":
-                return json.dumps(round(value / datainfo["scale"]))
-            case "blob":
-                assert isinstance(value, np.ndarray)
-                return json.dumps(base64.b64encode("".join(chr(c) for c in value).encode("utf-8")))
-            case "array":
-                assert isinstance(value, np.ndarray)
-                return json.dumps(value.tolist())
-            case "tuple" | "struct":
-                assert isinstance(value, np.ndarray)
-                return json.dumps(value.tolist()[0])
-            case _:
-                raise SecopError(f"Cannot handle SECoP dtype '{datainfo['type']}'")
-
     async def update(self, attr: AttrR[T, SecopAttributeIORef]) -> None:
         """Read value from device and update the value in FastCS."""
         try:
             raw_value = await secop_read(
                 self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
             )
-            value = self.decode(raw_value, attr.io_ref.datainfo, attr)
+            value = decode(raw_value, attr.io_ref.datainfo, attr)
             await attr.update(value)
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
@@ -186,7 +194,7 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
     async def send(self, attr: AttrW[T, SecopAttributeIORef], value: T) -> None:
         """Send a value from FastCS to the device."""
         try:
-            encoded_value = self.encode(value, attr.io_ref.datainfo)
+            encoded_value = encode(value, attr.io_ref.datainfo)
             await secop_change(
                 self._connection,
                 attr.io_ref.module_name,
@@ -226,8 +234,8 @@ class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
                 self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
             )
             # Get rid of timestamp and other specifiers, we just want the value
-            value, *_ = json.loads(raw_value)
-            await attr.update(json.dumps(value))
+            value, *_ = orjson.loads(raw_value)
+            await attr.update(orjson.dumps(value).decode())
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass
