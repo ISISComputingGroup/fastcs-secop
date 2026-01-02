@@ -9,6 +9,7 @@ deserialised
 deserialising
 enum
 enums
+pytest
 SECoP
 struct
 structs

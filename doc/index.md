@@ -23,6 +23,7 @@ transports/*
 :titlesonly:
 :caption: Reference
 
+contributing
 limitations
 _api
 ```

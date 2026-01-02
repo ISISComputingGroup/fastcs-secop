@@ -7,8 +7,7 @@ from fastcs.attributes import AttrRW
 from fastcs.connections import IPConnection
 
 from fastcs_secop import SecopError
-from fastcs_secop._util import secop_datainfo_to_fastcs_dtype
-from fastcs_secop.io import (
+from fastcs_secop._io import (
     SecopAttributeIO,
     SecopRawAttributeIO,
     decode,
@@ -16,6 +15,7 @@ from fastcs_secop.io import (
     secop_change,
     secop_read,
 )
+from fastcs_secop._util import secop_datainfo_to_fastcs_dtype
 
 
 async def test_read_accessible_success():
@@ -185,8 +185,8 @@ async def test_attribute_io_update(io_cls, expected):
     io = io_cls(connection=connection)
 
     with (
-        patch("fastcs_secop.io.secop_read", return_value='[123.456, {"t": 5, "e": 7}]'),
-        patch("fastcs_secop.io.decode", return_value=123.456),
+        patch("fastcs_secop._io.secop_read", return_value='[123.456, {"t": 5, "e": 7}]'),
+        patch("fastcs_secop._io.decode", return_value=123.456),
     ):
         await io.update(attr)
 
@@ -207,7 +207,7 @@ async def test_attribute_io_update_fails(io_cls, error):
     attr = AsyncMock(spec=AttrRW)
     io = io_cls(connection=connection)
 
-    with patch("fastcs_secop.io.secop_read", side_effect=error):
+    with patch("fastcs_secop._io.secop_read", side_effect=error):
         await io.update(attr)
 
 
@@ -224,8 +224,8 @@ async def test_attribute_io_send(io_cls, expected):
     io = io_cls(connection=connection)
 
     with (
-        patch("fastcs_secop.io.secop_change") as mock_change,
-        patch("fastcs_secop.io.encode", return_value="123.456"),
+        patch("fastcs_secop._io.secop_change") as mock_change,
+        patch("fastcs_secop._io.encode", return_value="123.456"),
     ):
         await io.send(attr, 123.456)
 
@@ -247,7 +247,7 @@ async def test_attribute_io_send_fails(io_cls, error):
     io = io_cls(connection=connection)
 
     with (
-        patch("fastcs_secop.io.secop_change", side_effect=error),
-        patch("fastcs_secop.io.encode", return_value="123.456"),
+        patch("fastcs_secop._io.secop_change", side_effect=error),
+        patch("fastcs_secop._io.encode", return_value="123.456"),
     ):
         await io.send(attr, 123.456)

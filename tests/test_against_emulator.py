@@ -12,7 +12,7 @@ from fastcs.attributes import AttrR
 from fastcs.connections import IPConnectionSettings
 from fastcs.logging import LogLevel, configure_logging
 
-from fastcs_secop.controllers import SecopController
+from fastcs_secop import SecopController
 
 configure_logging(level=LogLevel.TRACE)
 

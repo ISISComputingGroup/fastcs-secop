@@ -1,5 +1,12 @@
 # Tango
 
+:::{important}
+While supported by FastCS, and therefore by {py:obj}`fastcs_secop`, Tango support has not been extensively tested. This
+page documents some _known_ limitations.
+
+Modifications and improvements for Tango support are welcome. See {doc}`/contributing`.
+:::
+
 Tango transport requires `fastcs[tango]` to be installed.
 
 ## Supported SECoP data types

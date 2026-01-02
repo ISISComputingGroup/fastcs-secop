@@ -4,11 +4,12 @@ import orjson
 import pytest
 from fastcs.connections import IPConnectionSettings
 
-from fastcs_secop import SecopError, SecopQuirks
-from fastcs_secop.controllers import (
+from fastcs_secop import (
     SecopCommandController,
     SecopController,
+    SecopError,
     SecopModuleController,
+    SecopQuirks,
 )
 
 
@@ -98,7 +99,7 @@ async def test_create_modules():
         + "\n"
     )
 
-    await controller.create_modules()
+    await controller._create_modules()
     assert "a_cool_module" in controller.sub_controllers
     assert "another_cool_module" in controller.sub_controllers
     assert "a_skipped_module" not in controller.sub_controllers
@@ -113,7 +114,7 @@ async def test_create_modules_bad_description():
     controller._connection.send_query.return_value = "a huge pile of nonsense\n"
 
     with pytest.raises(SecopError):
-        await controller.create_modules()
+        await controller._create_modules()
 
 
 async def test_secop_module_controller_initialise():
@@ -144,7 +145,11 @@ async def test_secop_module_controller_initialise():
 async def test_command_controller_execute_fails():
     connection = AsyncMock()
     controller = SecopCommandController(
-        connection=connection, command_name="some_command", module_name="some_module", datainfo={}
+        connection=connection,
+        command_name="some_command",
+        module_name="some_module",
+        datainfo={},
+        quirks=SecopQuirks(),
     )
     await controller.initialise()
 
@@ -155,7 +160,11 @@ async def test_command_controller_execute_fails():
 async def test_command_controller_execute_no_args_no_return():
     connection = AsyncMock()
     controller = SecopCommandController(
-        connection=connection, command_name="some_command", module_name="some_module", datainfo={}
+        connection=connection,
+        command_name="some_command",
+        module_name="some_module",
+        datainfo={},
+        quirks=SecopQuirks(),
     )
     await controller.initialise()
 
@@ -170,6 +179,7 @@ async def test_command_controller_execute():
         command_name="some_command",
         module_name="some_module",
         datainfo={"argument": {"type": "int"}, "result": {"type": "int"}},
+        quirks=SecopQuirks(),
     )
     await controller.initialise()
     await controller.args.update(13)
@@ -179,3 +189,22 @@ async def test_command_controller_execute():
 
     connection.send_query.assert_awaited_once_with("do some_module:some_command 13\n")
     assert controller.result.get() == 42
+
+
+async def test_command_controller_execute_raw_args_and_result():
+    connection = AsyncMock()
+    controller = SecopCommandController(
+        connection=connection,
+        command_name="some_command",
+        module_name="some_module",
+        datainfo={"argument": {"type": "tuple"}, "result": {"type": "tuple"}},
+        quirks=SecopQuirks(raw_tuple=True),
+    )
+    await controller.initialise()
+    await controller.args.update("[13]")
+
+    connection.send_query.return_value = 'done some_module:some_command [[42], {"t": 123}]\n'
+    await controller.execute()
+
+    connection.send_query.assert_awaited_once_with("do some_module:some_command [13]\n")
+    assert controller.result.get() == "[42]"

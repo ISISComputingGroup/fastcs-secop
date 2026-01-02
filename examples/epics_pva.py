@@ -1,5 +1,6 @@
 """Example PVA IOC using :py:obj:`fastcs_secop`."""
 
+import argparse
 import asyncio
 import logging
 import socket
@@ -8,12 +9,16 @@ from fastcs.connections import IPConnectionSettings
 from fastcs.launch import FastCS
 from fastcs.logging import LogLevel, configure_logging
 
-from fastcs_secop import SecopQuirks
-from fastcs_secop.controllers import SecopController
+from fastcs_secop import SecopController, SecopQuirks
 
 if __name__ == "__main__":
     from fastcs.transports import EpicsIOCOptions
     from fastcs.transports.epics.pva import EpicsPVATransport
+
+    parser = argparse.ArgumentParser(description="Demo PVA ioc")
+    parser.add_argument("-i", "--ip", type=str, default="127.0.0.1", help="IP to connect to")
+    parser.add_argument("-p", "--port", type=int, help="Port to connect to")
+    args = parser.parse_args()
 
     configure_logging(level=LogLevel.DEBUG)
     logging.basicConfig(level=LogLevel.DEBUG)
@@ -30,11 +35,8 @@ if __name__ == "__main__":
         ],
     )
 
-    LEWIS = 57677
-    DOCKER_GASFLOW = 10801
-
     controller = SecopController(
-        settings=IPConnectionSettings(ip="127.0.0.1", port=LEWIS),
+        settings=IPConnectionSettings(ip=args.ip, port=args.port),
         quirks=quirks,
     )
 

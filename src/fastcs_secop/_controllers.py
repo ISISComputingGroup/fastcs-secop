@@ -10,12 +10,7 @@ from fastcs.connections import IPConnection, IPConnectionSettings
 from fastcs.controllers import Controller
 from fastcs.methods import command, scan
 
-from fastcs_secop import SecopQuirks
-from fastcs_secop._util import (
-    SecopError,
-    secop_datainfo_to_fastcs_dtype,
-)
-from fastcs_secop.io import (
+from fastcs_secop._io import (
     SecopAttributeIO,
     SecopAttributeIORef,
     SecopRawAttributeIO,
@@ -23,6 +18,7 @@ from fastcs_secop.io import (
     decode,
     encode,
 )
+from fastcs_secop._util import SecopError, SecopQuirks, is_raw, secop_datainfo_to_fastcs_dtype
 
 logger = getLogger(__name__)
 
@@ -37,6 +33,7 @@ class SecopCommandController(Controller):
         module_name: str,
         command_name: str,
         datainfo: dict[str, typing.Any],
+        quirks: SecopQuirks,
     ) -> None:
         """Subcontroller for a SECoP command.
 
@@ -45,27 +42,40 @@ class SecopCommandController(Controller):
             module_name: The module in which this command is defined.
             command_name: The name of the command.
             datainfo: The datainfo dictionary for this command.
+            quirks: The quirks configuration (see :py:obj:`~fastcs_secop.SecopQuirks`).
 
         """
         super().__init__()
 
-        self.connection = connection
-        self.module_name = module_name
-        self.command_name = command_name
-        self.datainfo = datainfo
+        self._connection = connection
+        self._module_name = module_name
+        self._command_name = command_name
+        self._datainfo = datainfo
+        self._quirks = quirks
+
+        self.raw_args = self._datainfo.get("argument") is not None and is_raw(
+            self._module_name, self._command_name, self._datainfo["argument"], self._quirks
+        )
+        self.raw_result = self._datainfo.get("result") is not None and is_raw(
+            self._module_name, self._command_name, self._datainfo["result"], self._quirks
+        )
 
     async def initialise(self) -> None:
         """Initialise the command controller.
 
         This will set up PVs for ``Args`` and ``Result`` (if they have a type).
         """
-        if self.datainfo.get("argument") is not None:
-            args_type = secop_datainfo_to_fastcs_dtype(self.datainfo["argument"])
+        if self._datainfo.get("argument") is not None:
+            args_type = secop_datainfo_to_fastcs_dtype(
+                self._datainfo["argument"], raw=self.raw_args
+            )
         else:
             args_type = None
 
-        if self.datainfo.get("result") is not None:
-            result_type = secop_datainfo_to_fastcs_dtype(self.datainfo["result"])
+        if self._datainfo.get("result") is not None:
+            result_type = secop_datainfo_to_fastcs_dtype(
+                self._datainfo["result"], raw=self.raw_result
+            )
         else:
             result_type = None
 
@@ -82,16 +92,19 @@ class SecopCommandController(Controller):
     @command()
     async def execute(self) -> None:
         """Execute the command."""
-        prefix = f"do {self.module_name}:{self.command_name}"
-        response_prefix = f"done {self.module_name}:{self.command_name}"
+        prefix = f"do {self._module_name}:{self._command_name}"
+        response_prefix = f"done {self._module_name}:{self._command_name}"
 
         if self.args is not None:
-            cmd = f"{prefix} {encode(self.args.get(), self.datainfo['argument'])}\n"
+            if self.raw_args:
+                cmd = f"{prefix} {self.args.get()}\n"
+            else:
+                cmd = f"{prefix} {encode(self.args.get(), self._datainfo['argument'])}\n"
         else:
             cmd = f"{prefix}\n"
 
         logger.debug("Sending command: '%s'", cmd)
-        response = await self.connection.send_query(cmd)
+        response = await self._connection.send_query(cmd)
         logger.debug("Response: '%s'", response)
 
         response = response.strip()
@@ -102,7 +115,10 @@ class SecopCommandController(Controller):
         response = response[len(response_prefix) :].strip()
 
         if self.result is not None:
-            await self.result.update(decode(response, self.datainfo["result"], self.result))
+            if self.raw_result:
+                await self.result.update(orjson.dumps(orjson.loads(response)[0]).decode())
+            else:
+                await self.result.update(decode(response, self._datainfo["result"], self.result))
 
 
 class SecopModuleController(Controller):
@@ -143,15 +159,6 @@ class SecopModuleController(Controller):
             ]
         )
 
-    def _is_raw(self, parameter_name: str, datainfo: dict[str, typing.Any]) -> bool:
-        return (
-            ((self._module_name, parameter_name) in self._quirks.raw_accessibles)
-            or (datainfo["type"] == "array" and self._quirks.raw_array)
-            or (datainfo["type"] == "tuple" and self._quirks.raw_tuple)
-            or (datainfo["type"] == "struct" and self._quirks.raw_struct)
-            or (datainfo["type"] == "matrix" and self._quirks.raw_matrix)
-        )
-
     async def initialise(self) -> None:
         """Create attributes for all accessibles in this SECoP module."""
         for parameter_name, parameter in self._module["accessibles"].items():
@@ -165,7 +172,7 @@ class SecopModuleController(Controller):
 
             attr_cls = AttrR if parameter.get("readonly", False) else AttrRW
 
-            raw = self._is_raw(parameter_name, datainfo)
+            raw = is_raw(self._module_name, parameter_name, datainfo, self._quirks)
 
             if raw:
                 io_ref = SecopRawAttributeIORef(
@@ -187,6 +194,7 @@ class SecopModuleController(Controller):
                     command_name=parameter_name,
                     connection=self._connection,
                     datainfo=datainfo,
+                    quirks=self._quirks,
                 )
                 self.add_sub_controller(parameter_name, command_controller)
                 await command_controller.initialise()
@@ -217,7 +225,7 @@ class SecopController(Controller):
         """
         self._ip_settings = settings
         self._connection = IPConnection()
-        self.quirks = quirks or SecopQuirks()
+        self._quirks = quirks or SecopQuirks()
 
         super().__init__()
 
@@ -309,9 +317,9 @@ class SecopController(Controller):
         await self.connect()
         await self.check_idn()
         await self.deactivate()
-        await self.create_modules()
+        await self._create_modules()
 
-    async def create_modules(self) -> None:
+    async def _create_modules(self) -> None:
         """Create subcontrollers for each SECoP module."""
         descriptor = await self._connection.send_query("describe\n")
         if not descriptor.startswith("describing . "):
@@ -323,19 +331,21 @@ class SecopController(Controller):
         equipment_id = descriptor["equipment_id"]
 
         logger.info("SECoP equipment_id = '%s', description = '%s'", equipment_id, description)
-        logger.debug("descriptor = %s", orjson.dumps(descriptor, option=orjson.OPT_INDENT_2))
+        logger.debug(
+            "descriptor = %s", orjson.dumps(descriptor, option=orjson.OPT_INDENT_2).decode()
+        )
 
         modules = descriptor["modules"]
 
         for module_name, module in modules.items():
-            if module_name in self.quirks.skip_modules:
+            if module_name in self._quirks.skip_modules:
                 continue
             logger.debug("Creating subcontroller for module %s", module_name)
             module_controller = SecopModuleController(
                 connection=self._connection,
                 module_name=module_name,
                 module=module,
-                quirks=self.quirks,
+                quirks=self._quirks,
             )
             await module_controller.initialise()
             self.add_sub_controller(name=module_name, sub_controller=module_controller)

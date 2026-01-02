@@ -1,4 +1,5 @@
 import enum
+import typing
 from collections.abc import Collection
 from dataclasses import dataclass, field
 from typing import Any
@@ -115,7 +116,7 @@ def secop_datainfo_to_fastcs_dtype(datainfo: dict[str, Any], raw: bool = False) 
 
     """
     if raw:
-        return String()
+        return String(2048)
 
     min_val = datainfo.get("min")
     max_val = datainfo.get("max")
@@ -164,3 +165,15 @@ def secop_datainfo_to_fastcs_dtype(datainfo: dict[str, Any], raw: bool = False) 
             return Waveform(datainfo["elementtype"], shape=datainfo["maxlen"][::-1])
         case _:
             raise SecopError(f"Invalid SECoP dtype for FastCS attribute: {datainfo['type']}")
+
+
+def is_raw(
+    module_name: str, parameter_name: str, datainfo: dict[str, typing.Any], quirks: SecopQuirks
+) -> bool:
+    return (
+        ((module_name, parameter_name) in quirks.raw_accessibles)
+        or (datainfo["type"] == "array" and quirks.raw_array)
+        or (datainfo["type"] == "tuple" and quirks.raw_tuple)
+        or (datainfo["type"] == "struct" and quirks.raw_struct)
+        or (datainfo["type"] == "matrix" and quirks.raw_matrix)
+    )
