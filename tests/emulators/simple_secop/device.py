@@ -164,6 +164,12 @@ class OneOfEachDtypeModule:
                     }
                 },
             ),
+            "matrix": Parameter(
+                {"len": [2, 3], "blob": "AACAPwAAAEAAAEBAAACAQAAAoEAAAMBA"},
+                desc="a matrix parameter",
+                dtype="matrix",
+                extra_datainfo={"elementtype": "<f4", "names": ["x", "y"], "maxlen": [100, 100]},
+            ),
             "command_bool_int": Command(
                 arg_datainfo={"type": "bool"},
                 result_datainfo={"type": "int"},

@@ -59,6 +59,10 @@ def test_invalid_secop_dtype_to_numpy_dtype():
         ({"type": "array", "maxlen": 8, "members": {"type": "int"}}, Waveform),
         ({"type": "tuple", "members": [{"type": "int"}]}, Table),
         ({"type": "struct", "members": {"int": {"type": "int"}}}, Table),
+        (
+            {"type": "matrix", "elementtype": "<f4", "names": ["x", "y"], "maxlen": [100, 100]},
+            Waveform,
+        ),
     ],
 )
 def test_secop_datainfo_to_fastcs_dtype(datainfo, expected_dtype):

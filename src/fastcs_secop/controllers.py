@@ -149,6 +149,7 @@ class SecopModuleController(Controller):
             or (datainfo["type"] == "array" and self._quirks.raw_array)
             or (datainfo["type"] == "tuple" and self._quirks.raw_tuple)
             or (datainfo["type"] == "struct" and self._quirks.raw_struct)
+            or (datainfo["type"] == "matrix" and self._quirks.raw_matrix)
         )
 
     async def initialise(self) -> None:

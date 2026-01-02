@@ -34,7 +34,7 @@ if __name__ == "__main__":
     DOCKER_GASFLOW = 10801
 
     controller = SecopController(
-        settings=IPConnectionSettings(ip="127.0.0.1", port=DOCKER_GASFLOW),
+        settings=IPConnectionSettings(ip="127.0.0.1", port=LEWIS),
         quirks=quirks,
     )
 

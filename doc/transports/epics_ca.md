@@ -15,6 +15,7 @@ EPICS CA transport supports the following {external+secop:doc}`SECoP data types 
 - string (`lsi`/`lso`)
 - blob (`waveform[char]`)
 - array of double/int/bool/{ref}`enum* <limitations_enum>` (`waveform`)
+- matrix, if the 'matrix' is 1-dimensional (`waveform`)
 - command (if arguments and return values are empty or one of the above types)
 
 Other data types can only be read or written in 'raw' mode.

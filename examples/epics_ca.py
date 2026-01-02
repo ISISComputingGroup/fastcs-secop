@@ -26,6 +26,7 @@ if __name__ == "__main__":
     quirks = SecopQuirks(
         raw_tuple=True,
         raw_struct=True,
+        raw_matrix=True,
         max_description_length=40,
         raw_accessibles=[
             ("valve_controller", "_domains_to_extract"),

@@ -33,6 +33,10 @@ class SecopQuirks:
     """If the accessible has an array type, read it in raw mode.
     """
 
+    raw_matrix: bool = False
+    """If the accessible has a matrix type, read it in raw mode.
+    """
+
     raw_tuple: bool = False
     """If the accessible has a tuple type, read it in raw mode.
 
@@ -156,5 +160,7 @@ def secop_datainfo_to_fastcs_dtype(datainfo: dict[str, Any], raw: bool = False) 
         case "struct":
             structured_dtype = struct_structured_dtype(datainfo)
             return Table(structured_dtype)
+        case "matrix":
+            return Waveform(datainfo["elementtype"], shape=datainfo["maxlen"][::-1])
         case _:
             raise SecopError(f"Invalid SECoP dtype for FastCS attribute: {datainfo['type']}")

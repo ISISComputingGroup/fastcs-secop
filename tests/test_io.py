@@ -112,6 +112,11 @@ class DummyEnum(enum.Enum):
             {"type": "struct", "members": {"e0": {"type": "int"}, "e1": {"type": "string"}}},
             '{"e0":300,"e1":"accelerating"}',
         ),
+        (
+            np.array([[1, 2], [3, 4], [5, 6]], dtype="<f4"),
+            {"type": "matrix", "elementtype": "<f4", "names": ["x", "y"], "maxlen": [100, 100]},
+            '{"len":[2,3],"blob":"AACAPwAAAEAAAEBAAACAQAAAoEAAAMBA"}',
+        ),
     ],
 )
 def test_encode(decoded, datainfo, encoded):
@@ -143,6 +148,11 @@ def test_encode(decoded, datainfo, encoded):
             np.array([(300, "accelerating")], dtype=[("e0", np.int32), ("e1", "<U512")]),
             {"type": "struct", "members": {"e0": {"type": "int"}, "e1": {"type": "string"}}},
             '{"e0":300,"e1":"accelerating"}',
+        ),
+        (
+            np.array([[1, 2], [3, 4], [5, 6]], dtype="<f4"),
+            {"type": "matrix", "elementtype": "<f4", "names": ["x", "y"], "maxlen": [100, 100]},
+            '{"len":[2,3],"blob":"AACAPwAAAEAAAEBAAACAQAAAoEAAAMBA"}',
         ),
     ],
 )

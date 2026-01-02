@@ -127,6 +127,11 @@ def decode(raw_value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # no
             for k, v in cast(dict[str, Any], value).items():
                 arr[0][k] = v
             return arr
+        case "matrix":
+            lengths = value["len"][::-1]
+            return np.frombuffer(
+                base64.b64decode(value["blob"]), dtype=datainfo["elementtype"]
+            ).reshape(lengths)
         case _:
             return value
 
@@ -164,6 +169,11 @@ def encode(value: T, datainfo: dict[str, Any]) -> str:
             for name in value.dtype.names:
                 ans[name] = value[name][0]
             return orjson.dumps(ans, option=orjson.OPT_SERIALIZE_NUMPY).decode()
+        case "matrix":
+            assert isinstance(value, np.ndarray)
+            return orjson.dumps(
+                {"len": value.shape[::-1], "blob": base64.b64encode(value.tobytes()).decode()}
+            ).decode()
         case _:
             raise SecopError(f"Cannot handle SECoP dtype '{datainfo['type']}'")
 
