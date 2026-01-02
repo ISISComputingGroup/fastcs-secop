@@ -1,9 +1,11 @@
 import numpy as np
 import pytest
+from fastcs.datatypes import Bool, Enum, Float, Int, String, Table, Waveform
 
 from fastcs_secop._util import (
     SecopError,
     format_string_to_prec,
+    secop_datainfo_to_fastcs_dtype,
     secop_dtype_to_numpy_dtype,
 )
 
@@ -42,3 +44,33 @@ def test_invalid_secop_dtype_to_numpy_dtype():
         SecopError, match=r"Cannot handle SECoP dtype 'array' within array/struct/tuple"
     ):
         secop_dtype_to_numpy_dtype({"type": "array"})
+
+
+@pytest.mark.parametrize(
+    ("datainfo", "expected_dtype"),
+    [
+        ({"type": "double"}, Float),
+        ({"type": "scaled"}, Float),
+        ({"type": "int"}, Int),
+        ({"type": "bool"}, Bool),
+        ({"type": "enum", "members": {"nope": 0, "yep": 1}}, Enum),
+        ({"type": "string"}, String),
+        ({"type": "blob", "maxbytes": 8}, Waveform),
+        ({"type": "array", "maxlen": 8, "members": {"type": "int"}}, Waveform),
+        ({"type": "tuple", "members": [{"type": "int"}]}, Table),
+        ({"type": "struct", "members": {"int": {"type": "int"}}}, Table),
+    ],
+)
+def test_secop_datainfo_to_fastcs_dtype(datainfo, expected_dtype):
+    assert isinstance(secop_datainfo_to_fastcs_dtype(datainfo), expected_dtype)
+
+
+def test_invalid_secop_datainfo_to_fastcs_dtype():
+    with pytest.raises(SecopError):
+        secop_datainfo_to_fastcs_dtype({"type": "some_type_that_does_not_exist"})
+
+
+def test_secop_datainfo_to_fastcs_dtype_raw():
+    assert isinstance(
+        secop_datainfo_to_fastcs_dtype({"type": "some_type_that_does_not_exist"}, raw=True), String
+    )

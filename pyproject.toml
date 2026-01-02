@@ -40,14 +40,19 @@ doc = [
   "sphinxcontrib-mermaid",
   "sphinxcontrib-spelling",
 ]
-dev = [
-  "fastcs-secop[doc]",
-  "lewis",
+lint = [
   "pyright",
+  "ruff",
+]
+test = [
+  "lewis",
   "pytest",
   "pytest-asyncio",
   "pytest-cov",
-  "ruff",
+]
+dev = [
+  "fastcs-secop[doc,lint,test]",
+  "fastcs[all]",
 ]
 
 [project.urls]
@@ -71,7 +76,7 @@ omit = [
 ]
 
 [tool.coverage.report]
-# fail_under = 100  # TODO
+fail_under = 100
 exclude_lines = [
   "pragma: no cover",
   "if TYPE_CHECKING:",

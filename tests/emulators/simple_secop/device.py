@@ -60,11 +60,18 @@ class Parameter(Accessible):
 
 
 class Command(Accessible):
+    def __init__(self, arg_datainfo, result_datainfo):
+        super().__init__()
+        self.arg_datainfo = arg_datainfo
+        self.result_datainfo = result_datainfo
+
     def descriptor(self) -> dict[str, typing.Any]:
         return {
             "description": "some_command_description",
             "datainfo": {
                 "type": "command",
+                "argument": self.arg_datainfo,
+                "result": self.result_datainfo,
             },
         }
 
@@ -81,7 +88,7 @@ class OneOfEachDtypeModule:
                 prec=4,
                 desc="a scaled parameter",
                 dtype="scaled",
-                extra_datainfo={"scale": 47},
+                extra_datainfo={"scale": 47, "min": 0, "max": 1_000_000},
             ),
             "int": Parameter(73, desc="an integer parameter", dtype="int"),
             "bool": Parameter(True, desc="a boolean parameter", dtype="bool"),
@@ -117,6 +124,18 @@ class OneOfEachDtypeModule:
                 dtype="array",
                 extra_datainfo={"maxlen": 512, "members": {"type": "bool"}},
             ),
+            "enum_array": Parameter(
+                [1, 2, 3, 2, 1],
+                desc="an enum array parameter",
+                dtype="array",
+                extra_datainfo={
+                    "maxlen": 512,
+                    "members": {
+                        "type": "enum",
+                        "members": {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5},
+                    },
+                },
+            ),
             "tuple": Parameter(
                 [1, 5.678, True, "hiya", 5],
                 desc="a tuple of int, float, bool",
@@ -144,6 +163,22 @@ class OneOfEachDtypeModule:
                         "mode": {"type": "enum"},
                     }
                 },
+            ),
+            "command_bool_int": Command(
+                arg_datainfo={"type": "bool"},
+                result_datainfo={"type": "int"},
+            ),
+            "command_null_int": Command(
+                arg_datainfo=None,
+                result_datainfo={"type": "int"},
+            ),
+            "command_bool_null": Command(
+                arg_datainfo={"type": "bool"},
+                result_datainfo=None,
+            ),
+            "command_null_null": Command(
+                arg_datainfo=None,
+                result_datainfo=None,
             ),
         }
 

@@ -89,4 +89,6 @@ intersphinx_mapping = {
     "secop": ("https://sampleenvironment.github.io/secop-site/", None),
     "fastcs": ("https://diamondlightsource.github.io/FastCS/main/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
+    "epics": ("https://docs.epics-controls.org/en/latest/", None),
+    "epics_base": ("https://docs.epics-controls.org/projects/base/en/latest/", None),
 }

@@ -152,3 +152,16 @@ class TestInitialState:
         await attr.wait_for_predicate(
             lambda v: np.array_equal(v, expected_initial_value), timeout=2
         )
+
+    @pytest.mark.parametrize(
+        ("command", "expected_attributes"),
+        [
+            ("command_bool_int", {"args", "result"}),
+            ("command_null_int", {"result"}),
+            ("command_bool_null", {"args"}),
+            ("command_null_null", set()),
+        ],
+    )
+    async def test_command_attributes_created(self, controller, command, expected_attributes):
+        cmd_controller = controller.sub_controllers["one_of_everything"].sub_controllers[command]
+        assert set(cmd_controller.attributes.keys()) == expected_attributes

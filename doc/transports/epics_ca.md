@@ -6,18 +6,18 @@ EPICS CA has a maximum length of 40 on parameter descriptions. Set {py:obj}`fast
 
 ## Supported SECoP data types
 
-EPICS CA transport supports the following {external+secop:doc}`SECoP data types <specification/datainfo>`:
-- double
-- scaled
-- int
-- bool
-- enum
-- string
-- blob
-- array of double/int/bool/{ref}`enum* <limitations_enum>`/string
+EPICS CA transport supports the following {external+secop:doc}`SECoP data types <specification/datainfo>`, using the corresponding {external+epics_base:doc}`EPICS record type <ComponentReference>`:
+- double (`ai`/`ao`)
+- scaled (`ai`/`ao`)
+- int (`longin`/`longout`)
+- bool (`bi`/`bo`)
+- enum (`mbbi`/`mbbo`)
+- string (`lsi`/`lso`)
+- blob (`waveform[char]`)
+- array of double/int/bool/{ref}`enum* <limitations_enum>` (`waveform`)
 - command (if arguments and return values are empty or one of the above types)
 
-Other data types can only be read in 'raw' mode.
+Other data types can only be read or written in 'raw' mode.
 
 ## Example CA IOC
 

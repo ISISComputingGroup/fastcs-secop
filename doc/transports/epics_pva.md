@@ -4,21 +4,21 @@ EPICS PVA transport requires `fastcs[epicspva]` to be installed.
 
 ## Supported SECoP data types
 
-EPICS PVA transport supports the following {external+secop:doc}`SECoP data types <specification/datainfo>`:
-- double
-- scaled
-- int
-- bool
-- enum
-- string
-- blob
-- array of double/int/bool/{ref}`enum* <limitations_enum>`/string
-- tuple of double/int/bool/{ref}`enum* <limitations_enum>`/string elements
-- struct of double/int/bool/{ref}`enum* <limitations_enum>`/string elements
-- matrix
+EPICS PVA transport supports the following {external+secop:doc}`SECoP data types <specification/datainfo>` (using the corresponding {external+epics:doc}`PVA normative types <pv-access/Normative-Types-Specification>`):
+- double (`NTScalar[double]`)
+- scaled (`NTScalar[double]`)
+- int (`NTScalar[int]`)
+- bool (`NTScalar[boolean]`)
+- enum (`NTEnum`)
+- string (`NTScalar[string]`)
+- blob (`NTNDArray[ubyte]`)
+- array of double/int/bool/{ref}`enum* <limitations_enum>` (`NTNDArray`)
+- tuple of double/int/bool/{ref}`enum* <limitations_enum>`/string elements (`NTTable` with one row)
+- struct of double/int/bool/{ref}`enum* <limitations_enum>`/string elements (`NTTable` with one row)
+- matrix (`NTNDArray`)
 - command (if arguments and return values are empty or one of the above types)
 
-Other data types can only be read in 'raw' mode.
+Other data types can only be read or written in 'raw' mode.
 
 ## PVI
 

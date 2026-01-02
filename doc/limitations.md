@@ -53,3 +53,9 @@ Asynchronous updates are not supported by {py:obj}`fastcs_secop`. They are turne
 {external+secop:doc}`deactivate message <specification/messages/activation>` at connection time.
 
 Rationale: FastCS does not currently provide infrastructure to handle asynchronous messages.
+
+{#limitations_qualifiers}
+## Timestamp and error qualifiers
+
+These are ignored; FastCS currently exposes no mechanism to set these. If such a mechanism is later added to FastCS,
+they may become supportable here.

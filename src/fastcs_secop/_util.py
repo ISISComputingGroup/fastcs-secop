@@ -18,35 +18,35 @@ class SecopQuirks:
     """
 
     update_period: float = 1.0
-    """Update period, in seconds, for this accessible."""
+    """Update period, in seconds."""
 
     skip_modules: Collection[str] = field(default_factory=list)
     """Skip creating any listed modules."""
 
     skip_accessibles: Collection[tuple[str, str]] = field(default_factory=list)
-    """Skip creating any listed (module_name, accessible_name) tuples."""
+    """Skip creating any listed ``(module_name, accessible_name)`` tuples."""
 
     raw_accessibles: Collection[tuple[str, str]] = field(default_factory=list)
-    """Create any listed (module_name, accessible_name) tuples in 'raw' mode."""
+    """Create any listed ``(module_name, accessible_name)`` tuples in 'raw' mode."""
 
     raw_array: bool = False
     """If the accessible has an array type, read it in raw mode.
-
-    This is useful for accessibles which contain unsupportable arrays
-    (e.g. nested, potentially ragged, arrays).
     """
+
     raw_tuple: bool = False
     """If the accessible has a tuple type, read it in raw mode.
 
     This is useful for transports which do not support the FastCS
     :py:obj:`~fastcs.datatypes.table.Table` type.
     """
+
     raw_struct: bool = False
     """If the accessible has a struct type, read it in raw mode.
 
     This is useful for transports which do not support the FastCS
     :py:obj:`~fastcs.datatypes.table.Table` type.
     """
+
     max_description_length: int | None = None
     """Truncate accessible descriptions to this length.
 

@@ -263,7 +263,11 @@ class SecopController(Controller):
         identification = await self._connection.send_query("*IDN?\n")
         identification = identification.strip()
 
-        manufacturer, product, _, _ = identification.split(",")
+        try:
+            manufacturer, product, _, _ = identification.split(",")
+        except ValueError as e:
+            raise SecopError("Invalid response to '*IDN?'") from e
+
         if manufacturer not in {
             "ISSE&SINE2020",  # SECOP 1.x
             "ISSE",  # SECOP 2.x
@@ -304,7 +308,10 @@ class SecopController(Controller):
         await self.connect()
         await self.check_idn()
         await self.deactivate()
+        await self.create_modules()
 
+    async def create_modules(self) -> None:
+        """Create subcontrollers for each SECoP module."""
         descriptor = await self._connection.send_query("describe\n")
         if not descriptor.startswith("describing . "):
             raise SecopError(f"Invalid response to 'describe': '{descriptor}'.")

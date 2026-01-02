@@ -96,7 +96,7 @@ class SecopRawAttributeIORef(AttributeIORef):
     accessible_name: str = ""
 
 
-def decode(value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # noqa ANN401
+def decode(raw_value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # noqa ANN401
     """Decode the transported value into a python datatype.
 
     Args:
@@ -107,7 +107,7 @@ def decode(value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # noqa A
         Python datatype representation of the transported value.
 
     """
-    value, *_ = orjson.loads(value)
+    value, *_ = orjson.loads(raw_value)
     match datainfo["type"]:
         case "enum":
             return attr.dtype(cast(int, value))
@@ -150,13 +150,13 @@ def encode(value: T, datainfo: dict[str, Any]) -> str:
         case "blob":
             assert isinstance(value, np.ndarray)
             return orjson.dumps(
-                base64.b64encode("".join(chr(c) for c in value).encode("utf-8"))
+                base64.b64encode("".join(chr(c) for c in value).encode("utf-8")).decode()
             ).decode()
         case "array":
             return orjson.dumps(value, option=orjson.OPT_SERIALIZE_NUMPY).decode()
         case "tuple":
             assert isinstance(value, np.ndarray)
-            return orjson.dumps(value[0], option=orjson.OPT_SERIALIZE_NUMPY).decode()
+            return orjson.dumps(value.tolist()[0]).decode()
         case "struct":
             assert isinstance(value, np.ndarray)
             ans = {}
