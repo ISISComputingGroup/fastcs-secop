@@ -16,7 +16,8 @@ You can also use `uv pip install -e .[dev]` if you have the [`uv`](https://docs.
 
 ## Linting
 
-Linting is performed by `ruff` (formatting & linting) and `pyright` (type-checking).
+Linting is performed by [ruff](https://docs.astral.sh/ruff/) (formatting & linting) and
+[pyright](https://github.com/microsoft/pyright) (type-checking).
 
 ```shell
 ruff format
@@ -26,8 +27,8 @@ pyright
 
 ## Documentation
 
-Documentation is built using `sphinx`. To get a local development build of the docs, use
-`sphinx-autobuild doc _build --watch src`.
+Documentation is built using [sphinx](https://www.sphinx-doc.org/en/master/).
+To get a local development build of the docs, use `sphinx-autobuild doc _build --watch src`.
 
 Spell checking is run automatically in CI - if a word is correctly spelt but the spellchecker flags it,
 add the word to `doc/spelling_wordlist.txt`.

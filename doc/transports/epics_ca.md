@@ -24,6 +24,7 @@ raw mode; set {py:obj}`SecopQuirks.raw_struct <fastcs_secop.SecopQuirks.raw_stru
 {py:obj}`SecopQuirks.raw_matrix <fastcs_secop.SecopQuirks.raw_matrix>` is also recommended, as only 1-D matrices are
 supported by CA.
 
+{#example_ca_ioc}
 ## Example CA IOC
 
 :::python

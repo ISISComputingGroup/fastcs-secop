@@ -45,6 +45,8 @@ extensions = [
     "sphinx.ext.viewcode",
     # Mermaid diagrams
     "sphinxcontrib.mermaid",
+    # Documentation links in code blocks
+    "sphinx_codeautolink",
 ]
 mermaid_d3_zoom = True
 napoleon_google_docstring = True
@@ -73,6 +75,7 @@ html_static_path = ["_static"]
 html_css_files = [
     "css/custom.css",
 ]
+html_logo = "logo.svg"
 
 autoclass_content = "init"
 myst_heading_anchors = 7

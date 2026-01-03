@@ -27,6 +27,7 @@ Other data types can only be read or written in 'raw' mode.
 SECoP modules can be found under the top-level PVI structure, while SECoP accessibles can be found under
 `module_name:PVI`. This means that the IOC is self-describing to downstream clients.
 
+{#example_pva_ioc}
 ## Example PVA IOC
 
 :::python

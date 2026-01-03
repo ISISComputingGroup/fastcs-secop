@@ -37,6 +37,7 @@ doc = [
   "sphinx_rtd_theme", 
   "myst_parser",
   "sphinx-autobuild",
+  "sphinx-codeautolink",
   "sphinxcontrib-mermaid",
   "sphinxcontrib-spelling",
 ]

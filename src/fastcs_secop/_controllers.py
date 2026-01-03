@@ -37,6 +37,9 @@ class SecopCommandController(Controller):
     ) -> None:
         """Subcontroller for a SECoP command.
 
+        This class is automatically added as a subcontroller by
+        :py:obj:`SecopModuleController` for command-type parameters.
+
         Args:
             connection: The connection to use.
             module_name: The module in which this command is defined.
@@ -134,8 +137,8 @@ class SecopModuleController(Controller):
     ) -> None:
         """FastCS controller for a SECoP module.
 
-        Instances of this class are added as subcontrollers by
-        :py:obj:`SecopController`.
+        This class is automatically added as a subcontroller by
+        :py:obj:`SecopController` for each present SECoP module.
 
         Args:
             connection: The connection to use.
@@ -216,6 +219,29 @@ class SecopController(Controller):
 
     def __init__(self, settings: IPConnectionSettings, quirks: SecopQuirks | None = None) -> None:
         """FastCS Controller for a SECoP node.
+
+        The intended usage is via :py:obj:`fastcs.control_system.FastCS`:
+
+        .. code-block:: python
+
+            from fastcs_secop import SecopController, SecopQuirks
+            from fastcs.control_system import FastCS
+
+            controller = SecopController(
+                settings=IPConnectionSettings(ip="127.0.0.1", port=1234),
+                quirks=SecopQuirks(...),
+            )
+
+            transports = [...]
+
+            fastcs = FastCS(
+                controller,
+                transports,
+            )
+            fastcs.run()
+
+        See Also:
+            :ref:`example_ca_ioc` and :ref:`example_pva_ioc` for examples of full configurations
 
         Args:
             settings: The communication settings (e.g. IP address, port) at which

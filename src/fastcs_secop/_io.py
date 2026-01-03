@@ -212,6 +212,7 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
                 encoded_value,
             )
             # Ugly, but I can't find a public alternative...
+            # https://github.com/DiamondLightSource/FastCS/pull/292
             await attr._call_sync_setpoint_callbacks(value)  # noqa: SLF001
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
@@ -223,8 +224,8 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
 class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
     """Raw IO for a SECoP parameter of any type other than 'command'.
 
-    For "raw" IO, no serialization/deserialization is performed. All values are transmitted
-    to/from FastCS as strings. It is up to the client to interpret those strings correctly.
+    For "raw" IO, all values are transmitted to/from FastCS as strings.
+    It is up to the client to interpret those strings correctly.
 
     This is intended as a fallback mode for transports which cannot represent complex
     data types.
@@ -262,6 +263,7 @@ class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
                 value,
             )
             # Ugly, but I can't find a public alternative...
+            # https://github.com/DiamondLightSource/FastCS/pull/292
             await attr._call_sync_setpoint_callbacks(value)  # noqa: SLF001
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task

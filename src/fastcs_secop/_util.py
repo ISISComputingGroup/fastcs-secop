@@ -28,18 +28,30 @@ class SecopQuirks:
     """Skip creating any listed ``(module_name, accessible_name)`` tuples."""
 
     raw_accessibles: Collection[tuple[str, str]] = field(default_factory=list)
-    """Create any listed ``(module_name, accessible_name)`` tuples in 'raw' mode."""
+    """Create any listed ``(module_name, accessible_name)`` tuples in raw mode.
+
+    JSON for the specified accessibles will be treated as strings.
+    """
 
     raw_array: bool = False
     """If the accessible has an array type, read it in raw mode.
+
+    JSON values for any array-type accessible will be treated as strings.
     """
 
     raw_matrix: bool = False
     """If the accessible has a matrix type, read it in raw mode.
+
+    JSON values for any matrix-type accessible will be treated as strings.
+
+    This is useful for transports which cannot represent arbitrary N-dimensional
+    arrays.
     """
 
     raw_tuple: bool = False
     """If the accessible has a tuple type, read it in raw mode.
+
+    JSON values for any tuple-type accessible will be treated as strings.
 
     This is useful for transports which do not support the FastCS
     :py:obj:`~fastcs.datatypes.table.Table` type.
@@ -47,6 +59,8 @@ class SecopQuirks:
 
     raw_struct: bool = False
     """If the accessible has a struct type, read it in raw mode.
+
+    JSON values for any struct-type accessible will be treated as strings.
 
     This is useful for transports which do not support the FastCS
     :py:obj:`~fastcs.datatypes.table.Table` type.
