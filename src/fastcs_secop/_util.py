@@ -159,7 +159,7 @@ def secop_datainfo_to_fastcs_dtype(datainfo: dict[str, Any], raw: bool = False) 
         case "bool":
             return Bool()
         case "enum":
-            enum_type = enum.Enum("enum_type", datainfo["members"])
+            enum_type = enum.Enum("GeneratedSecopEnum", datainfo["members"])
             return Enum(enum_type)
         case "string":
             return String()

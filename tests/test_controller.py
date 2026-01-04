@@ -142,7 +142,7 @@ async def test_secop_module_controller_initialise():
     assert "skipped_accessible" not in controller.attributes
 
 
-async def test_command_controller_execute_fails():
+async def test_command_controller_execute_invalid_response():
     connection = AsyncMock()
     controller = SecopCommandController(
         connection=connection,
@@ -154,6 +154,21 @@ async def test_command_controller_execute_fails():
     await controller.initialise()
 
     connection.send_query.return_value = "blah blah blah this isn't a valid response\n"
+    await controller.execute()  # No exception thrown
+
+
+async def test_command_controller_execute_fails():
+    connection = AsyncMock()
+    controller = SecopCommandController(
+        connection=connection,
+        command_name="some_command",
+        module_name="some_module",
+        datainfo={},
+        quirks=SecopQuirks(),
+    )
+    await controller.initialise()
+
+    connection.send_query.side_effect = Exception
     await controller.execute()  # No exception thrown
 
 

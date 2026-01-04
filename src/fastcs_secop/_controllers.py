@@ -95,33 +95,44 @@ class SecopCommandController(Controller):
     @command()
     async def execute(self) -> None:
         """Execute the command."""
-        prefix = f"do {self._module_name}:{self._command_name}"
-        response_prefix = f"done {self._module_name}:{self._command_name}"
+        try:
+            prefix = f"do {self._module_name}:{self._command_name}"
+            response_prefix = f"done {self._module_name}:{self._command_name}"
 
-        if self.args is not None:
-            if self.raw_args:
-                cmd = f"{prefix} {self.args.get()}\n"
+            if self.args is not None:
+                if self.raw_args:
+                    cmd = f"{prefix} {self.args.get()}\n"
+                else:
+                    cmd = f"{prefix} {encode(self.args.get(), self._datainfo['argument'])}\n"
             else:
-                cmd = f"{prefix} {encode(self.args.get(), self._datainfo['argument'])}\n"
-        else:
-            cmd = f"{prefix}\n"
+                cmd = f"{prefix}\n"
 
-        logger.debug("Sending command: '%s'", cmd)
-        response = await self._connection.send_query(cmd)
-        logger.debug("Response: '%s'", response)
+            logger.debug("Sending command: '%s'", cmd)
+            response = await self._connection.send_query(cmd)
+            logger.debug("Response: '%s'", response)
 
-        response = response.strip()
-        if not response.startswith(response_prefix):
-            logger.warning("command '%s' failed (response='%s')", prefix, response)
-            return
+            response = response.strip()
+            if not response.startswith(response_prefix):
+                logger.warning("command '%s' failed (response='%s')", prefix, response)
+                return
 
-        response = response[len(response_prefix) :].strip()
+            response = response[len(response_prefix) :].strip()
 
-        if self.result is not None:
-            if self.raw_result:
-                await self.result.update(orjson.dumps(orjson.loads(response)[0]).decode())
-            else:
-                await self.result.update(decode(response, self._datainfo["result"], self.result))
+            if self.result is not None:
+                if self.raw_result:
+                    await self.result.update(orjson.dumps(orjson.loads(response)[0]).decode())
+                else:
+                    await self.result.update(
+                        decode(response, self._datainfo["result"], self.result)
+                    )
+        except Exception as e:
+            logger.error(
+                "command %s:%s failed: %s: %s",
+                self._module_name,
+                self._command_name,
+                e.__class__.__name__,
+                e,
+            )
 
 
 class SecopModuleController(Controller):
@@ -318,7 +329,7 @@ class SecopController(Controller):
                 f"Not a SECoP device?"
             )
 
-        print(f"Connected to SECoP device with IDN='{identification}'.")
+        logger.info("Connected to SECoP device with IDN='%s'.", identification)
 
     async def initialise(self) -> None:
         """Set up FastCS for this SECoP node.

@@ -151,12 +151,12 @@ def encode(value: T, datainfo: dict[str, Any]) -> str:
             assert isinstance(value, enum.Enum)
             return orjson.dumps(value.value).decode()
         case "scaled":
-            return orjson.dumps(round(value / datainfo["scale"])).decode()
+            val = round(value / datainfo["scale"])
+            assert isinstance(val, int)
+            return orjson.dumps(val).decode()
         case "blob":
             assert isinstance(value, np.ndarray)
-            return orjson.dumps(
-                base64.b64encode("".join(chr(c) for c in value).encode("utf-8")).decode()
-            ).decode()
+            return orjson.dumps(base64.b64encode(value.tobytes()).decode()).decode()
         case "array":
             return orjson.dumps(value, option=orjson.OPT_SERIALIZE_NUMPY).decode()
         case "tuple":
@@ -217,8 +217,8 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass
-        except Exception:
-            logger.exception("Exception during send()")
+        except Exception as e:
+            logger.error("Exception during send() for %s: %s: %s", attr, e.__class__.__name__, e)
 
 
 class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):

@@ -45,7 +45,6 @@ async def controller():
             ip="127.0.0.1",
             port=57677,
         ),
-        quirks={},
     )
 
     for _ in range(100):
