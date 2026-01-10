@@ -113,7 +113,7 @@ class SecopCommandController(Controller):
 
             response = response.strip()
             if not response.startswith(response_prefix):
-                logger.warning("command '%s' failed (response='%s')", prefix, response)
+                logger.error("command '%s' failed (response='%s')", prefix, response)
                 return
 
             response = response[len(response_prefix) :].strip()

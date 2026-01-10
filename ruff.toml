@@ -44,6 +44,7 @@ ignore = [
     "PLR0914",  # Allow complex tests
     "PLC2701",  # Allow tests to import "private" things
     "SLF001",   # Allow tests to use "private" things
+    "RUF067",   # Standard pattern for LEWiS emulators
 ]
 "doc/conf.py" = [
     "D100"
