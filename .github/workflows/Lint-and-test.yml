@@ -1,0 +1,38 @@
+name: Lint-and-test
+on: [push, workflow_call]
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest", "windows-latest" ]
+        version: ['3.12']
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.version }}
+      - name: install requirements
+        run: uv sync --extra lint --extra test
+      - name: run ruff check
+        run: uv run ruff check
+      - name: run ruff format --check
+        run: uv run ruff format --check
+      - name: run pyright
+        run: uv run pyright
+      - name: run pytest
+        run: uv run pytest
+  results:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    name: Final Results
+    needs: [tests]
+    steps:
+    - run: exit 1
+      # see https://stackoverflow.com/a/67532120/4907315
+      if: >-
+          ${{
+               contains(needs.*.result, 'failure')
+            || contains(needs.*.result, 'cancelled')
+          }}

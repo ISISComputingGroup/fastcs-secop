@@ -1,0 +1,17 @@
+accessible
+accessibles
+bool
+datainfo
+datatype
+datatypes
+deserialisation
+deserialised
+deserialising
+enum
+enums
+pytest
+SECoP
+struct
+structs
+subcontroller
+subcontrollers
