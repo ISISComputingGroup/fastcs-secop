@@ -6,12 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-import os
-import sys
-
 from fastcs_secop.version import version
-
-sys.path.insert(0, os.path.abspath("../src"))
 
 project = "fastcs-secop"
 copyright = ""
@@ -22,8 +17,10 @@ release = version
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 nitpicky = True
+nitpick_ignore = [
+    ("py:class", "collections.abc.Collection[tuple[str")  # Sphinx bug...
+]
 nitpick_ignore_regex = [
-    ("py:class", r"^collections\.abc\.Collection\["),
     ("py:class", r"^.*\.T$"),
     ("py:obj", r"^.*\.T$"),
     ("py:class", r"^.*\.T.*_co$"),

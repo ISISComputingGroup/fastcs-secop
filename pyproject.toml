@@ -27,7 +27,8 @@ classifiers = [
 ]
 
 dependencies = [
-  "fastcs",
+  # Remove pin when new release made
+  "fastcs @ git+https://github.com/DiamondLightSource/FastCS",
   "orjson",
 ]
 
