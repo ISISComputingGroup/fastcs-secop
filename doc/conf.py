@@ -23,6 +23,7 @@ release = version
 
 nitpicky = True
 nitpick_ignore_regex = [
+    ("py:class", r"^collections\.abc\.Collection\["),
     ("py:class", r"^.*\.T$"),
     ("py:obj", r"^.*\.T$"),
     ("py:class", r"^.*\.T.*_co$"),
@@ -88,7 +89,7 @@ spelling_show_suggestions = True
 spelling_suggestion_limit = 3
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
+    "python": ("https://docs.python.org/3/", None),
     "secop": ("https://sampleenvironment.github.io/secop-site/", None),
     "fastcs": ("https://diamondlightsource.github.io/FastCS/main/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),

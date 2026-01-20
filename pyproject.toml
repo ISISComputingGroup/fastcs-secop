@@ -27,8 +27,7 @@ classifiers = [
 ]
 
 dependencies = [
-  # Pinned until https://github.com/DiamondLightSource/FastCS/pull/295 is merged and released
-  "fastcs @ git+https://github.com/Tom-Willemsen/FastCS@guard_methods_that_dont_work_on_windows",
+  "fastcs @ git+https://github.com/DiamondLightSource/FastCS",
   "orjson",
 ]
 
