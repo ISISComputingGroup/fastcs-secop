@@ -1,0 +1,968 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fastcs_secop._controllers &mdash; fastcs-secop 0.1.1.dev5+g99a72b18d documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=b2176991" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=532cfc05" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8ceb3b9b"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("True" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll(".mermaid svg");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("True" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #343131" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            fastcs-secop
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Transports</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../transports/epics_ca.html">EPICS Channel Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transports/epics_pva.html">EPICS PV Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transports/tango.html">Tango</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../limitations.html">Limitations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #343131" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">fastcs-secop</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">fastcs_secop._controllers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fastcs_secop._controllers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;FastCS controllers for SECoP nodes.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">orjson</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastcs.attributes</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrR</span><span class="p">,</span> <span class="n">AttrRW</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastcs.connections</span><span class="w"> </span><span class="kn">import</span> <span class="n">IPConnection</span><span class="p">,</span> <span class="n">IPConnectionSettings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastcs.controllers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Controller</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastcs.methods</span><span class="w"> </span><span class="kn">import</span> <span class="n">command</span><span class="p">,</span> <span class="n">scan</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastcs_secop._io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SecopAttributeIO</span><span class="p">,</span>
+    <span class="n">SecopAttributeIORef</span><span class="p">,</span>
+    <span class="n">SecopRawAttributeIO</span><span class="p">,</span>
+    <span class="n">SecopRawAttributeIORef</span><span class="p">,</span>
+    <span class="n">decode</span><span class="p">,</span>
+    <span class="n">encode</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastcs_secop._util</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecopError</span><span class="p">,</span> <span class="n">SecopQuirks</span><span class="p">,</span> <span class="n">is_raw</span><span class="p">,</span> <span class="n">secop_datainfo_to_fastcs_dtype</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SecopCommandController">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopCommandController">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecopCommandController</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SECoP command controller.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">connection</span><span class="p">:</span> <span class="n">IPConnection</span><span class="p">,</span>
+        <span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">command_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">datainfo</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">quirks</span><span class="p">:</span> <span class="n">SecopQuirks</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subcontroller for a SECoP command.</span>
+
+<span class="sd">        This class is automatically added as a subcontroller by</span>
+<span class="sd">        :py:obj:`SecopModuleController` for command-type parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            connection: The connection to use.</span>
+<span class="sd">            module_name: The module in which this command is defined.</span>
+<span class="sd">            command_name: The name of the command.</span>
+<span class="sd">            datainfo: The datainfo dictionary for this command.</span>
+<span class="sd">            quirks: The quirks configuration (see :py:obj:`~fastcs_secop.SecopQuirks`).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span> <span class="o">=</span> <span class="n">module_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_command_name</span> <span class="o">=</span> <span class="n">command_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span> <span class="o">=</span> <span class="n">datainfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span> <span class="o">=</span> <span class="n">quirks</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;argument&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">is_raw</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_command_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="p">[</span><span class="s2">&quot;argument&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;result&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">is_raw</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_command_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="SecopCommandController.initialise">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopCommandController.initialise">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">initialise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the command controller.</span>
+
+<span class="sd">        This will set up PVs for ``Args`` and ``Result`` (if they have a type).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;argument&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args_type</span> <span class="o">=</span> <span class="n">secop_datainfo_to_fastcs_dtype</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="p">[</span><span class="s2">&quot;argument&quot;</span><span class="p">],</span> <span class="n">raw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_args</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;result&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result_type</span> <span class="o">=</span> <span class="n">secop_datainfo_to_fastcs_dtype</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">],</span> <span class="n">raw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_result</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">args_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">AttrRW</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;args&quot;</span><span class="p">,</span> <span class="n">datatype</span><span class="o">=</span><span class="n">args_type</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">AttrR</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;result&quot;</span><span class="p">,</span> <span class="n">datatype</span><span class="o">=</span><span class="n">result_type</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SecopCommandController.execute">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopCommandController.execute">[docs]</a>
+    <span class="nd">@command</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute the command.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;do </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_command_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">response_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;done </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_command_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_args</span><span class="p">:</span>
+                    <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="p">[</span><span class="s1">&#39;argument&#39;</span><span class="p">])</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Sending command: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">send_query</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Response: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">response_prefix</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;command &#39;</span><span class="si">%s</span><span class="s2">&#39; failed (response=&#39;</span><span class="si">%s</span><span class="s2">&#39;)&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">response_prefix</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_result</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">orjson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">orjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                        <span class="n">decode</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datainfo</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+                    <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;command </span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2"> failed: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_command_name</span><span class="p">,</span>
+                <span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">e</span><span class="p">,</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SecopModuleController">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopModuleController">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecopModuleController</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;FastCS controller for a SECoP module.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">connection</span><span class="p">:</span> <span class="n">IPConnection</span><span class="p">,</span>
+        <span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">module</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">quirks</span><span class="p">:</span> <span class="n">SecopQuirks</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;FastCS controller for a SECoP module.</span>
+
+<span class="sd">        This class is automatically added as a subcontroller by</span>
+<span class="sd">        :py:obj:`SecopController` for each present SECoP module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            connection: The connection to use.</span>
+<span class="sd">            module_name: The name of the SECoP module.</span>
+<span class="sd">            module: A deserialised description, in the</span>
+<span class="sd">                :external+secop:doc:`SECoP over-the-wire format &lt;specification/descriptive&gt;`,</span>
+<span class="sd">                of this module.</span>
+<span class="sd">            quirks: Affects how attributes are processed.</span>
+<span class="sd">                See :py:obj:`~fastcs_secop.SecopQuirks` for details.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span> <span class="o">=</span> <span class="n">module_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_module</span> <span class="o">=</span> <span class="n">module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span> <span class="o">=</span> <span class="n">quirks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">connection</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">ios</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">SecopAttributeIO</span><span class="p">(</span><span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">),</span>
+                <span class="n">SecopRawAttributeIO</span><span class="p">(</span><span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="SecopModuleController.initialise">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopModuleController.initialise">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">initialise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create attributes for all accessibles in this SECoP module.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">parameter_name</span><span class="p">,</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module</span><span class="p">[</span><span class="s2">&quot;accessibles&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span><span class="o">.</span><span class="n">skip_accessibles</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating attribute for parameter </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">)</span>
+            <span class="n">datainfo</span> <span class="o">=</span> <span class="n">parameter</span><span class="p">[</span><span class="s2">&quot;datainfo&quot;</span><span class="p">]</span>
+
+            <span class="n">description</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span><span class="o">.</span><span class="n">max_description_length</span><span class="p">]</span>
+
+            <span class="n">attr_cls</span> <span class="o">=</span> <span class="n">AttrR</span> <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;readonly&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">else</span> <span class="n">AttrRW</span>
+
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">is_raw</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">,</span> <span class="n">datainfo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">raw</span><span class="p">:</span>
+                <span class="n">io_ref</span> <span class="o">=</span> <span class="n">SecopRawAttributeIORef</span><span class="p">(</span>
+                    <span class="n">module_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="p">,</span>
+                    <span class="n">accessible_name</span><span class="o">=</span><span class="n">parameter_name</span><span class="p">,</span>
+                    <span class="n">update_period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span><span class="o">.</span><span class="n">update_period</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">io_ref</span> <span class="o">=</span> <span class="n">SecopAttributeIORef</span><span class="p">(</span>
+                    <span class="n">module_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="p">,</span>
+                    <span class="n">accessible_name</span><span class="o">=</span><span class="n">parameter_name</span><span class="p">,</span>
+                    <span class="n">update_period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span><span class="o">.</span><span class="n">update_period</span><span class="p">,</span>
+                    <span class="n">datainfo</span><span class="o">=</span><span class="n">datainfo</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">datainfo</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;command&quot;</span><span class="p">:</span>
+                <span class="n">command_controller</span> <span class="o">=</span> <span class="n">SecopCommandController</span><span class="p">(</span>
+                    <span class="n">module_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_name</span><span class="p">,</span>
+                    <span class="n">command_name</span><span class="o">=</span><span class="n">parameter_name</span><span class="p">,</span>
+                    <span class="n">connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="p">,</span>
+                    <span class="n">datainfo</span><span class="o">=</span><span class="n">datainfo</span><span class="p">,</span>
+                    <span class="n">quirks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_sub_controller</span><span class="p">(</span><span class="n">parameter_name</span><span class="p">,</span> <span class="n">command_controller</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">command_controller</span><span class="o">.</span><span class="n">initialise</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fastcs_type</span> <span class="o">=</span> <span class="n">secop_datainfo_to_fastcs_dtype</span><span class="p">(</span><span class="n">datainfo</span><span class="o">=</span><span class="n">datainfo</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">raw</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span>
+                    <span class="n">parameter_name</span><span class="p">,</span>
+                    <span class="n">attr_cls</span><span class="p">(</span>
+                        <span class="n">fastcs_type</span><span class="p">,</span>
+                        <span class="n">io_ref</span><span class="o">=</span><span class="n">io_ref</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SecopController">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopController">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecopController</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;FastCS Controller for a SECoP node.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">:</span> <span class="n">IPConnectionSettings</span><span class="p">,</span> <span class="n">quirks</span><span class="p">:</span> <span class="n">SecopQuirks</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;FastCS Controller for a SECoP node.</span>
+
+<span class="sd">        The intended usage is via :py:obj:`fastcs.control_system.FastCS`:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            from fastcs_secop import SecopController, SecopQuirks</span>
+<span class="sd">            from fastcs.control_system import FastCS</span>
+
+<span class="sd">            controller = SecopController(</span>
+<span class="sd">                settings=IPConnectionSettings(ip=&quot;127.0.0.1&quot;, port=1234),</span>
+<span class="sd">                quirks=SecopQuirks(...),</span>
+<span class="sd">            )</span>
+
+<span class="sd">            transports = [...]</span>
+
+<span class="sd">            fastcs = FastCS(</span>
+<span class="sd">                controller,</span>
+<span class="sd">                transports,</span>
+<span class="sd">            )</span>
+<span class="sd">            fastcs.run()</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :ref:`example_ca_ioc` and :ref:`example_pva_ioc` for examples of full configurations</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            settings: The communication settings (e.g. IP address, port) at which</span>
+<span class="sd">                the SECoP node is reachable.</span>
+<span class="sd">            quirks: :py:obj:`~fastcs_secop.SecopQuirks` that affects how attributes are processed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ip_settings</span> <span class="o">=</span> <span class="n">settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">IPConnection</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span> <span class="o">=</span> <span class="n">quirks</span> <span class="ow">or</span> <span class="n">SecopQuirks</span><span class="p">()</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SecopController.connect">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopController.connect">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Connect to the SECoP node.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ip_settings</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecopController.deactivate">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopController.deactivate">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turn off asynchronous SECoP communication.</span>
+
+<span class="sd">        See :external+secop:doc:`specification/messages/activation` for details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">send_query</span><span class="p">(</span><span class="s2">&quot;deactivate</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecopController.ping">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopController.ping">[docs]</a>
+    <span class="nd">@scan</span><span class="p">(</span><span class="mf">15.0</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ping the SECoP device, to check connection is still open.</span>
+
+<span class="sd">        Attempts to reconnect if the connection was not open (e.g. closed</span>
+<span class="sd">        by remote end or network break).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">send_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ping </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ConnectionError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Detected connection loss, attempting reconnect.&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reconnect successful.&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reconnect failed.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecopController.check_idn">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopController.check_idn">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_idn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify that the device is a SECoP device.</span>
+
+<span class="sd">        This is checked using the SECoP</span>
+<span class="sd">        :external+secop:doc:`identification message &lt;specification/messages/identification&gt;`.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            SecopError: if the device is not a SECoP device.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">identification</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">send_query</span><span class="p">(</span><span class="s2">&quot;*IDN?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">identification</span> <span class="o">=</span> <span class="n">identification</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">manufacturer</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">identification</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SecopError</span><span class="p">(</span><span class="s2">&quot;Invalid response to &#39;*IDN?&#39;&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+        <span class="k">if</span> <span class="n">manufacturer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span>
+            <span class="s2">&quot;ISSE&amp;SINE2020&quot;</span><span class="p">,</span>  <span class="c1"># SECOP 1.x</span>
+            <span class="s2">&quot;ISSE&quot;</span><span class="p">,</span>  <span class="c1"># SECOP 2.x</span>
+        <span class="p">}:</span>
+            <span class="k">raise</span> <span class="n">SecopError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Device responded to &#39;*IDN?&#39; with bad manufacturer string &#39;</span><span class="si">{</span><span class="n">manufacturer</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Not a SECoP device?&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">product</span> <span class="o">!=</span> <span class="s2">&quot;SECoP&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SecopError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Device responded to &#39;*IDN?&#39; with bad product string &#39;</span><span class="si">{</span><span class="n">product</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Not a SECoP device?&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Connected to SECoP device with IDN=&#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">,</span> <span class="n">identification</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecopController.initialise">
+<a class="viewcode-back" href="../../generated/fastcs_secop.html#fastcs_secop.SecopController.initialise">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">initialise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up FastCS for this SECoP node.</span>
+
+<span class="sd">        This introspects the</span>
+<span class="sd">        :external+secop:doc:`description &lt;specification/messages/description&gt;`</span>
+<span class="sd">        of the SECoP device to determine the names and contents of the modules</span>
+<span class="sd">        in this SECoP node.</span>
+
+<span class="sd">        A subcontroller of type :py:obj:`SecopModuleController` is added for</span>
+<span class="sd">        each discovered module.</span>
+
+<span class="sd">        This controller attempts to periodically reconnect to the device if the</span>
+<span class="sd">        connection was closed, and disables asynchronous messages on instantiation.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            SecopError: if the device is not a SECoP device, if a reply in an</span>
+<span class="sd">                unexpected format is received, or the SECoP node&#39;s configuration</span>
+<span class="sd">                cannot be handled by :py:obj:`fastcs_secop`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_idn</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_modules</span><span class="p">()</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_create_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create subcontrollers for each SECoP module.&quot;&quot;&quot;</span>
+        <span class="n">descriptor</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">send_query</span><span class="p">(</span><span class="s2">&quot;describe</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;describing . &quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">SecopError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid response to &#39;describe&#39;: &#39;</span><span class="si">{</span><span class="n">descriptor</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+
+        <span class="n">descriptor</span> <span class="o">=</span> <span class="n">orjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">descriptor</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;describing . &quot;</span><span class="p">)</span> <span class="p">:])</span>
+
+        <span class="n">description</span> <span class="o">=</span> <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+        <span class="n">equipment_id</span> <span class="o">=</span> <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;equipment_id&quot;</span><span class="p">]</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;SECoP equipment_id = &#39;</span><span class="si">%s</span><span class="s2">&#39;, description = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">equipment_id</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;descriptor = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">orjson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="n">orjson</span><span class="o">.</span><span class="n">OPT_INDENT_2</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">module_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span><span class="o">.</span><span class="n">skip_modules</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating subcontroller for module </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">module_name</span><span class="p">)</span>
+            <span class="n">module_controller</span> <span class="o">=</span> <span class="n">SecopModuleController</span><span class="p">(</span>
+                <span class="n">connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="p">,</span>
+                <span class="n">module_name</span><span class="o">=</span><span class="n">module_name</span><span class="p">,</span>
+                <span class="n">module</span><span class="o">=</span><span class="n">module</span><span class="p">,</span>
+                <span class="n">quirks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_quirks</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">module_controller</span><span class="o">.</span><span class="n">initialise</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_sub_controller</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">module_name</span><span class="p">,</span> <span class="n">sub_controller</span><span class="o">=</span><span class="n">module_controller</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

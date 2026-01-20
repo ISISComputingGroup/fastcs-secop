@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html class="writer-html5" data-content_root="../" lang="en">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EPICS Channel Access — fastcs-secop 0.1.1.dev5+g99a72b18d documentation</title>
+<link href="../_static/pygments.css?v=b86133f3" rel="stylesheet" type="text/css"/>
+<link href="../_static/css/theme.css?v=9edc463e" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css?v=b2176991" rel="stylesheet" type="text/css"/>
+<link href="../_static/css/custom.css?v=532cfc05" rel="stylesheet" type="text/css"/>
+<script src="../_static/jquery.js?v=5d32c60e"></script>
+<script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+<script src="../_static/documentation_options.js?v=8ceb3b9b"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/js/theme.js"></script>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="epics_pva.html" rel="next" title="EPICS PV Access"/>
+<link href="../index.html" rel="prev" title="fastcs-secop documentation"/>
+</head>
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search" style="background: #343131">
+<a class="icon icon-home" href="../index.html">
+            fastcs-secop
+              <img alt="Logo" class="logo" src="../_static/logo.svg"/>
+</a>
+<div role="search">
+<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+</div>
+</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<p class="caption" role="heading"><span class="caption-text">Transports</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">EPICS Channel Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="epics_pva.html">EPICS PV Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tango.html">Tango</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../limitations.html">Limitations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_api.html">API</a></li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top" style="background: #343131">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../index.html">fastcs-secop</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content">
+<div aria-label="Page navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+<li class="breadcrumb-item active">EPICS Channel Access</li>
+<li class="wy-breadcrumbs-aside">
+<a class="fa fa-github" href="https://github.com/ISISComputingGroup/fastcs-secop/blob/main/doc/transports/epics_ca.md"> Edit on GitHub</a>
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div itemprop="articleBody">
+<section class="tex2jax_ignore mathjax_ignore" id="epics-channel-access">
+<h1>EPICS Channel Access<a class="headerlink" href="#epics-channel-access" title="Link to this heading"></a></h1>
+<p>EPICS CA transport requires <code class="docutils literal notranslate"><span class="pre">fastcs[epicsca]</span></code> to be installed.</p>
+<p>EPICS CA has a maximum length of 40 on parameter descriptions. Set <a class="reference internal" href="../generated/fastcs_secop.html#fastcs_secop.SecopQuirks.max_description_length" title="fastcs_secop.SecopQuirks.max_description_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopQuirks.max_description_length</span></code></a> to 40 to truncate descriptions.</p>
+<section id="supported-secop-data-types">
+<h2>Supported SECoP data types<a class="headerlink" href="#supported-secop-data-types" title="Link to this heading"></a></h2>
+<p>EPICS CA transport supports the following <a class="reference external" href="https://sampleenvironment.github.io/secop-site/specification/datainfo.html" title="(in SECoP)"><span class="xref std std-doc">SECoP data types</span></a>, using the corresponding <a class="reference external" href="https://docs.epics-controls.org/projects/base/en/latest/ComponentReference.html" title="(in EPICS Base Documentation)"><span class="xref std std-doc">EPICS record type</span></a>:</p>
+<ul class="simple">
+<li><p>double (<code class="docutils literal notranslate"><span class="pre">ai</span></code>/<code class="docutils literal notranslate"><span class="pre">ao</span></code>)</p></li>
+<li><p>scaled (<code class="docutils literal notranslate"><span class="pre">ai</span></code>/<code class="docutils literal notranslate"><span class="pre">ao</span></code>)</p></li>
+<li><p>int (<code class="docutils literal notranslate"><span class="pre">longin</span></code>/<code class="docutils literal notranslate"><span class="pre">longout</span></code>)</p></li>
+<li><p>bool (<code class="docutils literal notranslate"><span class="pre">bi</span></code>/<code class="docutils literal notranslate"><span class="pre">bo</span></code>)</p></li>
+<li><p>enum (<code class="docutils literal notranslate"><span class="pre">mbbi</span></code>/<code class="docutils literal notranslate"><span class="pre">mbbo</span></code>)</p></li>
+<li><p>string (<code class="docutils literal notranslate"><span class="pre">lsi</span></code>/<code class="docutils literal notranslate"><span class="pre">lso</span></code>)</p></li>
+<li><p>blob (<code class="docutils literal notranslate"><span class="pre">waveform[char]</span></code>)</p></li>
+<li><p>array of double/int/bool/<a class="reference internal" href="../limitations.html#limitations-enum"><span class="std std-ref">enum*</span></a> (<code class="docutils literal notranslate"><span class="pre">waveform</span></code>)</p></li>
+<li><p>matrix, if the ‘matrix’ is 1-dimensional (<code class="docutils literal notranslate"><span class="pre">waveform</span></code>)</p></li>
+<li><p>command (if arguments and return values are empty or one of the above types)</p></li>
+</ul>
+<p>Other data types can only be read or written in ‘raw’ mode. In particular, structs and tuples will need to be read in
+raw mode; set <a class="reference internal" href="../generated/fastcs_secop.html#fastcs_secop.SecopQuirks.raw_struct" title="fastcs_secop.SecopQuirks.raw_struct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopQuirks.raw_struct</span></code></a> and
+<a class="reference internal" href="../generated/fastcs_secop.html#fastcs_secop.SecopQuirks.raw_tuple" title="fastcs_secop.SecopQuirks.raw_tuple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopQuirks.raw_tuple</span></code></a>.
+<a class="reference internal" href="../generated/fastcs_secop.html#fastcs_secop.SecopQuirks.raw_matrix" title="fastcs_secop.SecopQuirks.raw_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopQuirks.raw_matrix</span></code></a> is also recommended, as only 1-D matrices are
+supported by CA.</p>
+</section>
+<section id="example-ca-ioc">
+<h2>Example CA IOC<a class="headerlink" href="#example-ca-ioc" title="Link to this heading"></a></h2>
+<div class="python docutils">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">"""Example CA IOC using :py:obj:`fastcs_secop`."""</span>
+
+<span class="kn">import</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/argparse.html#module-argparse" title="argparse"><span class="nn">argparse</span></a>
+<span class="kn">import</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="asyncio"><span class="nn">asyncio</span></a>
+<span class="kn">import</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://sampleenvironment.github.io/secop-site/specification/messages/optional.html#logging" title="logging"><span class="nn">logging</span></a>
+<span class="kn">import</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/socket.html#module-socket" title="socket"><span class="nn">socket</span></a>
+
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.connections.html#module-fastcs.connections" title="fastcs.connections"><span class="nn">fastcs.connections</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.connections.ip_connection.html#fastcs.connections.ip_connection.IPConnectionSettings" title="fastcs.connections.ip_connection.IPConnectionSettings"><span class="n">IPConnectionSettings</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.launch.html#module-fastcs.launch" title="fastcs.launch"><span class="nn">fastcs.launch</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.control_system.html#fastcs.control_system.FastCS" title="fastcs.control_system.FastCS"><span class="n">FastCS</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.logging.html#module-fastcs.logging" title="fastcs.logging"><span class="nn">fastcs.logging</span></a><span class="w"> </span><span class="kn">import</span> <span class="n">LogLevel</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.logging.html#fastcs.logging.configure_logging" title="fastcs.logging.configure_logging"><span class="n">configure_logging</span></a>
+
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#module-fastcs_secop" title="fastcs_secop"><span class="nn">fastcs_secop</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#fastcs_secop.SecopController" title="fastcs_secop._controllers.SecopController"><span class="n">SecopController</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#fastcs_secop.SecopQuirks" title="fastcs_secop._util.SecopQuirks"><span class="n">SecopQuirks</span></a>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.transports.html#module-fastcs.transports" title="fastcs.transports"><span class="nn">fastcs.transports</span></a><span class="w"> </span><span class="kn">import</span> <span class="n">EpicsIOCOptions</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">fastcs.transports.epics.ca</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpicsCATransport</span>
+
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="argparse.ArgumentParser"><span class="n">parser</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="argparse.ArgumentParser"><span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span></a><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Demo PVA ioc"</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.add_argument" title="argparse.ArgumentParser.add_argument"><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span></a><span class="p">(</span><span class="s2">"-i"</span><span class="p">,</span> <span class="s2">"--ip"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"IP to connect to"</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.add_argument" title="argparse.ArgumentParser.add_argument"><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span></a><span class="p">(</span><span class="s2">"-p"</span><span class="p">,</span> <span class="s2">"--port"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"Port to connect to"</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.parse_args" title="argparse.ArgumentParser.parse_args"><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span></a><span class="p">()</span>
+
+    <a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.logging.html#fastcs.logging.configure_logging" title="fastcs.logging.configure_logging"><span class="n">configure_logging</span></a><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/logging.html#logging.basicConfig" title="logging.basicConfig"><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span></a><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.get_event_loop" title="asyncio.get_event_loop"><span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span></a><span class="p">()</span><span class="o">.</span><span class="n">slow_callback_duration</span> <span class="o">=</span> <span class="mi">1000</span>
+
+    <span class="n">epics_options</span> <span class="o">=</span> <span class="n">EpicsIOCOptions</span><span class="p">(</span><span class="n">pv_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">"TE:</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/socket.html#socket.gethostname" title="socket.gethostname"><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span></a><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">:SECOP"</span><span class="p">)</span>
+    <span class="n">epics_ca</span> <span class="o">=</span> <span class="n">EpicsCATransport</span><span class="p">(</span><span class="n">epicsca</span><span class="o">=</span><span class="n">epics_options</span><span class="p">)</span>
+
+    <a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#fastcs_secop.SecopQuirks" title="fastcs_secop._util.SecopQuirks"><span class="n">quirks</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#fastcs_secop.SecopQuirks" title="fastcs_secop._util.SecopQuirks"><span class="n">SecopQuirks</span></a><span class="p">(</span>
+        <span class="n">raw_tuple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">raw_struct</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">raw_matrix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">max_description_length</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+        <span class="n">raw_accessibles</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">(</span><span class="s2">"valve_controller"</span><span class="p">,</span> <span class="s2">"_domains_to_extract"</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">"valve_controller"</span><span class="p">,</span> <span class="s2">"_terminal_values"</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#fastcs_secop.SecopController" title="fastcs_secop._controllers.SecopController"><span class="n">controller</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#fastcs_secop.SecopController" title="fastcs_secop._controllers.SecopController"><span class="n">SecopController</span></a><span class="p">(</span>
+        <span class="n">settings</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.connections.ip_connection.html#fastcs.connections.ip_connection.IPConnectionSettings" title="fastcs.connections.ip_connection.IPConnectionSettings"><span class="n">IPConnectionSettings</span></a><span class="p">(</span><span class="n">ip</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">),</span>
+        <span class="n">quirks</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#fastcs_secop.SecopQuirks" title="fastcs_secop._util.SecopQuirks"><span class="n">quirks</span></a><span class="p">,</span>
+    <span class="p">)</span>
+
+    <a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.control_system.html#fastcs.control_system.FastCS" title="fastcs.control_system.FastCS"><span class="n">fastcs</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.control_system.html#fastcs.control_system.FastCS" title="fastcs.control_system.FastCS"><span class="n">FastCS</span></a><span class="p">(</span>
+        <a class="sphinx-codeautolink-a" href="../generated\fastcs_secop.html#fastcs_secop.SecopController" title="fastcs_secop._controllers.SecopController"><span class="n">controller</span></a><span class="p">,</span>
+        <span class="p">[</span><span class="n">epics_ca</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">fastcs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</div>
+</div>
+<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+<a accesskey="p" class="btn btn-neutral float-left" href="../index.html" rel="prev" title="fastcs-secop documentation"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+<a accesskey="n" class="btn btn-neutral float-right" href="epics_pva.html" rel="next" title="EPICS PV Access">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<p>© Copyright .</p>
+</div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+</div>
+</div>
+</section>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+</body>
+</html>

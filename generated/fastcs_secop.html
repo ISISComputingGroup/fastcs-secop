@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fastcs_secop &mdash; fastcs-secop 0.1.1.dev5+g99a72b18d documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-codeautolink.css?v=b2176991" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=532cfc05" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8ceb3b9b"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fastcs_secop.version" href="fastcs_secop.version.html" />
+    <link rel="prev" title="API" href="../_api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #343131" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            fastcs-secop
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Transports</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../transports/epics_ca.html">EPICS Channel Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transports/epics_pva.html">EPICS PV Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transports/tango.html">Tango</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../limitations.html">Limitations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../_api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">fastcs_secop</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fastcs_secop.version.html"><code class="docutils literal notranslate"><span class="pre">fastcs_secop.version</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #343131" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">fastcs-secop</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../_api.html">API</a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">fastcs_secop</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/ISISComputingGroup/fastcs-secop/blob/main/doc/generated/fastcs_secop.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-fastcs_secop">
+<span id="fastcs-secop"></span><h1><code class="docutils literal notranslate"><span class="pre">fastcs_secop</span></code><a class="headerlink" href="#module-fastcs_secop" title="Link to this heading"></a></h1>
+<p>SECoP support using FastCS.</p>
+<p class="rubric">Submodules</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="fastcs_secop.version.html#module-fastcs_secop.version" title="fastcs_secop.version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">version</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="fastcs_secop.SecopCommandController">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">fastcs_secop.</span></span><span class="sig-name descname"><span class="pre">SecopCommandController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.connections.ip_connection.html#fastcs.connections.ip_connection.IPConnection" title="(in FastCS main)"><span class="pre">IPConnection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">datainfo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quirks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fastcs_secop.SecopQuirks" title="fastcs_secop._util.SecopQuirks"><span class="pre">SecopQuirks</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopCommandController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopCommandController" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.controllers.controller.html#fastcs.controllers.controller.Controller" title="(in FastCS main)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Controller</span></code></a></p>
+<p>Subcontroller for a SECoP command.</p>
+<p>This class is automatically added as a subcontroller by
+<a class="reference internal" href="#fastcs_secop.SecopModuleController" title="fastcs_secop.SecopModuleController"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopModuleController</span></code></a> for command-type parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> – The connection to use.</p></li>
+<li><p><strong>module_name</strong> – The module in which this command is defined.</p></li>
+<li><p><strong>command_name</strong> – The name of the command.</p></li>
+<li><p><strong>datainfo</strong> – The datainfo dictionary for this command.</p></li>
+<li><p><strong>quirks</strong> – The quirks configuration (see <a class="reference internal" href="#fastcs_secop.SecopQuirks" title="fastcs_secop.SecopQuirks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopQuirks</span></code></a>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fastcs_secop.SecopCommandController.execute">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopCommandController.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopCommandController.execute" title="Link to this definition"></a></dt>
+<dd><p>Execute the command.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastcs_secop.SecopCommandController.initialise">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopCommandController.initialise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopCommandController.initialise" title="Link to this definition"></a></dt>
+<dd><p>Initialise the command controller.</p>
+<p>This will set up PVs for <code class="docutils literal notranslate"><span class="pre">Args</span></code> and <code class="docutils literal notranslate"><span class="pre">Result</span></code> (if they have a type).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fastcs_secop.SecopController">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">fastcs_secop.</span></span><span class="sig-name descname"><span class="pre">SecopController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.connections.ip_connection.html#fastcs.connections.ip_connection.IPConnectionSettings" title="(in FastCS main)"><span class="pre">IPConnectionSettings</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">quirks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fastcs_secop.SecopQuirks" title="fastcs_secop._util.SecopQuirks"><span class="pre">SecopQuirks</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopController" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.controllers.controller.html#fastcs.controllers.controller.Controller" title="(in FastCS main)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Controller</span></code></a></p>
+<p>FastCS Controller for a SECoP node.</p>
+<p>The intended usage is via <a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.control_system.html#fastcs.control_system.FastCS" title="(in FastCS main)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fastcs.control_system.FastCS</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">fastcs_secop</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecopController</span><span class="p">,</span> <span class="n">SecopQuirks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastcs.control_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastCS</span>
+
+<span class="n">controller</span> <span class="o">=</span> <span class="n">SecopController</span><span class="p">(</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">IPConnectionSettings</span><span class="p">(</span><span class="n">ip</span><span class="o">=</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">1234</span><span class="p">),</span>
+    <span class="n">quirks</span><span class="o">=</span><span class="n">SecopQuirks</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">transports</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+
+<span class="n">fastcs</span> <span class="o">=</span> <span class="n">FastCS</span><span class="p">(</span>
+    <span class="n">controller</span><span class="p">,</span>
+    <span class="n">transports</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">fastcs</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../transports/epics_ca.html#example-ca-ioc"><span class="std std-ref">Example CA IOC</span></a> and <a class="reference internal" href="../transports/epics_pva.html#example-pva-ioc"><span class="std std-ref">Example PVA IOC</span></a> for examples of full configurations</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>settings</strong> – The communication settings (e.g. IP address, port) at which
+the SECoP node is reachable.</p></li>
+<li><p><strong>quirks</strong> – <a class="reference internal" href="#fastcs_secop.SecopQuirks" title="fastcs_secop.SecopQuirks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopQuirks</span></code></a> that affects how attributes are processed.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fastcs_secop.SecopController.check_idn">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">check_idn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopController.check_idn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopController.check_idn" title="Link to this definition"></a></dt>
+<dd><p>Verify that the device is a SECoP device.</p>
+<p>This is checked using the SECoP
+<a class="reference external" href="https://sampleenvironment.github.io/secop-site/specification/messages/identification.html" title="(in SECoP)"><span class="xref std std-doc">identification message</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fastcs_secop.SecopError" title="fastcs_secop.SecopError"><strong>SecopError</strong></a> – if the device is not a SECoP device.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastcs_secop.SecopController.connect">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopController.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopController.connect" title="Link to this definition"></a></dt>
+<dd><p>Connect to the SECoP node.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastcs_secop.SecopController.deactivate">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopController.deactivate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopController.deactivate" title="Link to this definition"></a></dt>
+<dd><p>Turn off asynchronous SECoP communication.</p>
+<p>See <a class="reference external" href="https://sampleenvironment.github.io/secop-site/specification/messages/activation.html" title="(in SECoP)"><span>activate, deactivate: Control events</span></a> for details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastcs_secop.SecopController.initialise">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopController.initialise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopController.initialise" title="Link to this definition"></a></dt>
+<dd><p>Set up FastCS for this SECoP node.</p>
+<p>This introspects the
+<a class="reference external" href="https://sampleenvironment.github.io/secop-site/specification/messages/description.html" title="(in SECoP)"><span class="xref std std-doc">description</span></a>
+of the SECoP device to determine the names and contents of the modules
+in this SECoP node.</p>
+<p>A subcontroller of type <a class="reference internal" href="#fastcs_secop.SecopModuleController" title="fastcs_secop.SecopModuleController"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopModuleController</span></code></a> is added for
+each discovered module.</p>
+<p>This controller attempts to periodically reconnect to the device if the
+connection was closed, and disables asynchronous messages on instantiation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fastcs_secop.SecopError" title="fastcs_secop.SecopError"><strong>SecopError</strong></a> – if the device is not a SECoP device, if a reply in an
+    unexpected format is received, or the SECoP node’s configuration
+    cannot be handled by <a class="reference internal" href="#module-fastcs_secop" title="fastcs_secop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fastcs_secop</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastcs_secop.SecopController.ping">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ping</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopController.ping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopController.ping" title="Link to this definition"></a></dt>
+<dd><p>Ping the SECoP device, to check connection is still open.</p>
+<p>Attempts to reconnect if the connection was not open (e.g. closed
+by remote end or network break).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fastcs_secop.SecopError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">fastcs_secop.</span></span><span class="sig-name descname"><span class="pre">SecopError</span></span><a class="reference internal" href="../_modules/fastcs_secop/_util.html#SecopError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Error raised to identify a SECoP protocol or configuration problem.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fastcs_secop.SecopModuleController">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">fastcs_secop.</span></span><span class="sig-name descname"><span class="pre">SecopModuleController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.connections.ip_connection.html#fastcs.connections.ip_connection.IPConnection" title="(in FastCS main)"><span class="pre">IPConnection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quirks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fastcs_secop.SecopQuirks" title="fastcs_secop._util.SecopQuirks"><span class="pre">SecopQuirks</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopModuleController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopModuleController" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.controllers.controller.html#fastcs.controllers.controller.Controller" title="(in FastCS main)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Controller</span></code></a></p>
+<p>FastCS controller for a SECoP module.</p>
+<p>This class is automatically added as a subcontroller by
+<a class="reference internal" href="#fastcs_secop.SecopController" title="fastcs_secop.SecopController"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopController</span></code></a> for each present SECoP module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> – The connection to use.</p></li>
+<li><p><strong>module_name</strong> – The name of the SECoP module.</p></li>
+<li><p><strong>module</strong> – A deserialised description, in the
+<a class="reference external" href="https://sampleenvironment.github.io/secop-site/specification/descriptive.html" title="(in SECoP)"><span class="xref std std-doc">SECoP over-the-wire format</span></a>,
+of this module.</p></li>
+<li><p><strong>quirks</strong> – Affects how attributes are processed.
+See <a class="reference internal" href="#fastcs_secop.SecopQuirks" title="fastcs_secop.SecopQuirks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopQuirks</span></code></a> for details.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fastcs_secop.SecopModuleController.initialise">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/fastcs_secop/_controllers.html#SecopModuleController.initialise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopModuleController.initialise" title="Link to this definition"></a></dt>
+<dd><p>Create attributes for all accessibles in this SECoP module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">fastcs_secop.</span></span><span class="sig-name descname"><span class="pre">SecopQuirks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_modules</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" title="(in Python v3.14)"><span class="pre">Collection</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_accessibles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Collection[tuple[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_accessibles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Collection[tuple[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_description_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fastcs_secop/_util.html#SecopQuirks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fastcs_secop.SecopQuirks" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Define special handling for SECoP modules or accessibles.</p>
+<p>Not all combinations of SECoP features can be handled by all
+transports. <a class="reference internal" href="#fastcs_secop.SecopQuirks" title="fastcs_secop.SecopQuirks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecopQuirks</span></code></a> allows specifying non-default
+behaviour to work around these limitations.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.max_description_length">
+<span class="sig-name descname"><span class="pre">max_description_length</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.max_description_length" title="Link to this definition"></a></dt>
+<dd><p>Truncate accessible descriptions to this length.</p>
+<p>This is useful for transports such as EPICS CA which have a maximum description length.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.raw_accessibles">
+<span class="sig-name descname"><span class="pre">raw_accessibles</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" title="(in Python v3.14)"><span class="pre">Collection</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.raw_accessibles" title="Link to this definition"></a></dt>
+<dd><p>Create any listed <code class="docutils literal notranslate"><span class="pre">(module_name,</span> <span class="pre">accessible_name)</span></code> tuples in raw mode.</p>
+<p>JSON for the specified accessibles will be treated as strings.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.raw_array">
+<span class="sig-name descname"><span class="pre">raw_array</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.raw_array" title="Link to this definition"></a></dt>
+<dd><p>If the accessible has an array type, read it in raw mode.</p>
+<p>JSON values for any array-type accessible will be treated as strings.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.raw_matrix">
+<span class="sig-name descname"><span class="pre">raw_matrix</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.raw_matrix" title="Link to this definition"></a></dt>
+<dd><p>If the accessible has a matrix type, read it in raw mode.</p>
+<p>JSON values for any matrix-type accessible will be treated as strings.</p>
+<p>This is useful for transports which cannot represent arbitrary N-dimensional
+arrays.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.raw_struct">
+<span class="sig-name descname"><span class="pre">raw_struct</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.raw_struct" title="Link to this definition"></a></dt>
+<dd><p>If the accessible has a struct type, read it in raw mode.</p>
+<p>JSON values for any struct-type accessible will be treated as strings.</p>
+<p>This is useful for transports which do not support the FastCS
+<a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.datatypes.table.html#fastcs.datatypes.table.Table" title="(in FastCS main)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.raw_tuple">
+<span class="sig-name descname"><span class="pre">raw_tuple</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.raw_tuple" title="Link to this definition"></a></dt>
+<dd><p>If the accessible has a tuple type, read it in raw mode.</p>
+<p>JSON values for any tuple-type accessible will be treated as strings.</p>
+<p>This is useful for transports which do not support the FastCS
+<a class="reference external" href="https://diamondlightsource.github.io/FastCS/main/_api/fastcs.datatypes.table.html#fastcs.datatypes.table.Table" title="(in FastCS main)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.skip_accessibles">
+<span class="sig-name descname"><span class="pre">skip_accessibles</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" title="(in Python v3.14)"><span class="pre">Collection</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.skip_accessibles" title="Link to this definition"></a></dt>
+<dd><p>Skip creating any listed <code class="docutils literal notranslate"><span class="pre">(module_name,</span> <span class="pre">accessible_name)</span></code> tuples.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.skip_modules">
+<span class="sig-name descname"><span class="pre">skip_modules</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" title="(in Python v3.14)"><span class="pre">Collection</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.skip_modules" title="Link to this definition"></a></dt>
+<dd><p>Skip creating any listed modules.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fastcs_secop.SecopQuirks.update_period">
+<span class="sig-name descname"><span class="pre">update_period</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#fastcs_secop.SecopQuirks.update_period" title="Link to this definition"></a></dt>
+<dd><p>Update period, in seconds.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../_api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fastcs_secop.version.html" class="btn btn-neutral float-right" title="fastcs_secop.version" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

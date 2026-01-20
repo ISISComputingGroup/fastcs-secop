@@ -1,0 +1,953 @@
+{
+  "_api": [],
+  "contributing": [],
+  "generated\\fastcs_secop": [
+    {
+      "source": "from fastcs_secop import SecopController, SecopQuirks\nfrom fastcs.control_system import FastCS\n\ncontroller = SecopController(\n    settings=IPConnectionSettings(ip=\"127.0.0.1\", port=1234),\n    quirks=SecopQuirks(...),\n)\n\ntransports = [...]\n\nfastcs = FastCS(\n    controller,\n    transports,\n)\nfastcs.run()",
+      "names": [
+        {
+          "import_components": [
+            "fastcs_secop"
+          ],
+          "code_str": "fastcs_secop",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_from",
+          "resolved_location": "fastcs_secop"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController"
+          ],
+          "code_str": "SecopController",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks"
+          ],
+          "code_str": "SecopQuirks",
+          "lineno": 1,
+          "end_lineno": 1,
+          "context": "import_target",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "control_system"
+          ],
+          "code_str": "fastcs.control_system",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_from",
+          "resolved_location": "fastcs.control_system"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "control_system",
+            "FastCS"
+          ],
+          "code_str": "FastCS",
+          "lineno": 2,
+          "end_lineno": 2,
+          "context": "import_target",
+          "resolved_location": "fastcs.control_system.FastCS"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController"
+          ],
+          "code_str": "SecopController",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks"
+          ],
+          "code_str": "SecopQuirks",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "none",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController",
+            "()"
+          ],
+          "code_str": "controller",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "control_system",
+            "FastCS"
+          ],
+          "code_str": "FastCS",
+          "lineno": 11,
+          "end_lineno": 11,
+          "context": "none",
+          "resolved_location": "fastcs.control_system.FastCS"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController",
+            "()"
+          ],
+          "code_str": "controller",
+          "lineno": 12,
+          "end_lineno": 12,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "control_system",
+            "FastCS",
+            "()"
+          ],
+          "code_str": "fastcs",
+          "lineno": 11,
+          "end_lineno": 11,
+          "context": "none",
+          "resolved_location": "fastcs.control_system.FastCS"
+        }
+      ],
+      "example": {
+        "document": "generated\\fastcs_secop",
+        "ref_id": "module-fastcs_secop",
+        "headings": [
+          "fastcs_secop"
+        ]
+      },
+      "doc_lineno": 5
+    }
+  ],
+  "generated\\fastcs_secop.version": [],
+  "index": [],
+  "limitations": [],
+  "transports\\epics_ca": [
+    {
+      "source": "\"\"\"Example CA IOC using :py:obj:`fastcs_secop`.\"\"\"\n\nimport argparse\nimport asyncio\nimport logging\nimport socket\n\nfrom fastcs.connections import IPConnectionSettings\nfrom fastcs.launch import FastCS\nfrom fastcs.logging import LogLevel, configure_logging\n\nfrom fastcs_secop import SecopController, SecopQuirks\n\nif __name__ == \"__main__\":\n    from fastcs.transports import EpicsIOCOptions\n    from fastcs.transports.epics.ca import EpicsCATransport\n\n    parser = argparse.ArgumentParser(description=\"Demo PVA ioc\")\n    parser.add_argument(\"-i\", \"--ip\", type=str, default=\"127.0.0.1\", help=\"IP to connect to\")\n    parser.add_argument(\"-p\", \"--port\", type=int, help=\"Port to connect to\")\n    args = parser.parse_args()\n\n    configure_logging(level=LogLevel.DEBUG)\n    logging.basicConfig(level=LogLevel.DEBUG)\n\n    asyncio.get_event_loop().slow_callback_duration = 1000\n\n    epics_options = EpicsIOCOptions(pv_prefix=f\"TE:{socket.gethostname().upper()}:SECOP\")\n    epics_ca = EpicsCATransport(epicsca=epics_options)\n\n    quirks = SecopQuirks(\n        raw_tuple=True,\n        raw_struct=True,\n        raw_matrix=True,\n        max_description_length=40,\n        raw_accessibles=[\n            (\"valve_controller\", \"_domains_to_extract\"),\n            (\"valve_controller\", \"_terminal_values\"),\n        ],\n    )\n\n    controller = SecopController(\n        settings=IPConnectionSettings(ip=args.ip, port=args.port),\n        quirks=quirks,\n    )\n\n    fastcs = FastCS(\n        controller,\n        [epics_ca],\n    )\n    fastcs.run(interactive=True)\n",
+      "names": [
+        {
+          "import_components": [
+            "argparse"
+          ],
+          "code_str": "argparse",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "import_target",
+          "resolved_location": "argparse"
+        },
+        {
+          "import_components": [
+            "asyncio"
+          ],
+          "code_str": "asyncio",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "import_target",
+          "resolved_location": "asyncio"
+        },
+        {
+          "import_components": [
+            "logging"
+          ],
+          "code_str": "logging",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "import_target",
+          "resolved_location": "logging"
+        },
+        {
+          "import_components": [
+            "socket"
+          ],
+          "code_str": "socket",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "import_target",
+          "resolved_location": "socket"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "connections"
+          ],
+          "code_str": "fastcs.connections",
+          "lineno": 8,
+          "end_lineno": 8,
+          "context": "import_from",
+          "resolved_location": "fastcs.connections"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "connections",
+            "IPConnectionSettings"
+          ],
+          "code_str": "IPConnectionSettings",
+          "lineno": 8,
+          "end_lineno": 8,
+          "context": "import_target",
+          "resolved_location": "fastcs.connections.ip_connection.IPConnectionSettings"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "launch"
+          ],
+          "code_str": "fastcs.launch",
+          "lineno": 9,
+          "end_lineno": 9,
+          "context": "import_from",
+          "resolved_location": "fastcs.launch"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "launch",
+            "FastCS"
+          ],
+          "code_str": "FastCS",
+          "lineno": 9,
+          "end_lineno": 9,
+          "context": "import_target",
+          "resolved_location": "fastcs.control_system.FastCS"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "logging"
+          ],
+          "code_str": "fastcs.logging",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "import_from",
+          "resolved_location": "fastcs.logging"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "logging",
+            "configure_logging"
+          ],
+          "code_str": "configure_logging",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "import_target",
+          "resolved_location": "fastcs.logging.configure_logging"
+        },
+        {
+          "import_components": [
+            "fastcs_secop"
+          ],
+          "code_str": "fastcs_secop",
+          "lineno": 12,
+          "end_lineno": 12,
+          "context": "import_from",
+          "resolved_location": "fastcs_secop"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController"
+          ],
+          "code_str": "SecopController",
+          "lineno": 12,
+          "end_lineno": 12,
+          "context": "import_target",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks"
+          ],
+          "code_str": "SecopQuirks",
+          "lineno": 12,
+          "end_lineno": 12,
+          "context": "import_target",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "transports"
+          ],
+          "code_str": "fastcs.transports",
+          "lineno": 15,
+          "end_lineno": 15,
+          "context": "import_from",
+          "resolved_location": "fastcs.transports"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser"
+          ],
+          "code_str": "argparse.ArgumentParser",
+          "lineno": 18,
+          "end_lineno": 18,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser",
+            "()"
+          ],
+          "code_str": "parser",
+          "lineno": 18,
+          "end_lineno": 18,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser",
+            "()",
+            "add_argument"
+          ],
+          "code_str": "parser.add_argument",
+          "lineno": 19,
+          "end_lineno": 19,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser.add_argument"
+        },
+        {
+          "import_components": [
+            "str"
+          ],
+          "code_str": "str",
+          "lineno": 19,
+          "end_lineno": 19,
+          "context": "none",
+          "resolved_location": "str"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser",
+            "()",
+            "add_argument"
+          ],
+          "code_str": "parser.add_argument",
+          "lineno": 20,
+          "end_lineno": 20,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser.add_argument"
+        },
+        {
+          "import_components": [
+            "int"
+          ],
+          "code_str": "int",
+          "lineno": 20,
+          "end_lineno": 20,
+          "context": "none",
+          "resolved_location": "int"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser",
+            "()",
+            "parse_args"
+          ],
+          "code_str": "parser.parse_args",
+          "lineno": 21,
+          "end_lineno": 21,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser.parse_args"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "logging",
+            "configure_logging"
+          ],
+          "code_str": "configure_logging",
+          "lineno": 23,
+          "end_lineno": 23,
+          "context": "none",
+          "resolved_location": "fastcs.logging.configure_logging"
+        },
+        {
+          "import_components": [
+            "logging",
+            "basicConfig"
+          ],
+          "code_str": "logging.basicConfig",
+          "lineno": 24,
+          "end_lineno": 24,
+          "context": "none",
+          "resolved_location": "logging.basicConfig"
+        },
+        {
+          "import_components": [
+            "asyncio",
+            "get_event_loop"
+          ],
+          "code_str": "asyncio.get_event_loop",
+          "lineno": 26,
+          "end_lineno": 26,
+          "context": "none",
+          "resolved_location": "asyncio.get_event_loop"
+        },
+        {
+          "import_components": [
+            "socket",
+            "gethostname"
+          ],
+          "code_str": "socket.gethostname",
+          "lineno": 28,
+          "end_lineno": 28,
+          "context": "none",
+          "resolved_location": "socket.gethostname"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks"
+          ],
+          "code_str": "SecopQuirks",
+          "lineno": 31,
+          "end_lineno": 31,
+          "context": "none",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks",
+            "()"
+          ],
+          "code_str": "quirks",
+          "lineno": 31,
+          "end_lineno": 31,
+          "context": "none",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController"
+          ],
+          "code_str": "SecopController",
+          "lineno": 42,
+          "end_lineno": 42,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "connections",
+            "IPConnectionSettings"
+          ],
+          "code_str": "IPConnectionSettings",
+          "lineno": 43,
+          "end_lineno": 43,
+          "context": "none",
+          "resolved_location": "fastcs.connections.ip_connection.IPConnectionSettings"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks",
+            "()"
+          ],
+          "code_str": "quirks",
+          "lineno": 44,
+          "end_lineno": 44,
+          "context": "none",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController",
+            "()"
+          ],
+          "code_str": "controller",
+          "lineno": 42,
+          "end_lineno": 42,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "launch",
+            "FastCS"
+          ],
+          "code_str": "FastCS",
+          "lineno": 47,
+          "end_lineno": 47,
+          "context": "none",
+          "resolved_location": "fastcs.control_system.FastCS"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController",
+            "()"
+          ],
+          "code_str": "controller",
+          "lineno": 48,
+          "end_lineno": 48,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "launch",
+            "FastCS",
+            "()"
+          ],
+          "code_str": "fastcs",
+          "lineno": 47,
+          "end_lineno": 47,
+          "context": "none",
+          "resolved_location": "fastcs.control_system.FastCS"
+        }
+      ],
+      "example": {
+        "document": "transports\\epics_ca",
+        "ref_id": "example-ca-ioc",
+        "headings": [
+          "EPICS Channel Access",
+          "Example CA IOC"
+        ]
+      },
+      "doc_lineno": 31
+    }
+  ],
+  "transports\\epics_pva": [
+    {
+      "source": "\"\"\"Example PVA IOC using :py:obj:`fastcs_secop`.\"\"\"\n\nimport argparse\nimport asyncio\nimport logging\nimport socket\n\nfrom fastcs.connections import IPConnectionSettings\nfrom fastcs.launch import FastCS\nfrom fastcs.logging import LogLevel, configure_logging\n\nfrom fastcs_secop import SecopController, SecopQuirks\n\nif __name__ == \"__main__\":\n    from fastcs.transports import EpicsIOCOptions\n    from fastcs.transports.epics.pva import EpicsPVATransport\n\n    parser = argparse.ArgumentParser(description=\"Demo PVA ioc\")\n    parser.add_argument(\"-i\", \"--ip\", type=str, default=\"127.0.0.1\", help=\"IP to connect to\")\n    parser.add_argument(\"-p\", \"--port\", type=int, help=\"Port to connect to\")\n    args = parser.parse_args()\n\n    configure_logging(level=LogLevel.DEBUG)\n    logging.basicConfig(level=LogLevel.DEBUG)\n\n    asyncio.get_event_loop().slow_callback_duration = 1000\n\n    epics_options = EpicsIOCOptions(pv_prefix=f\"TE:{socket.gethostname().upper()}:SECOP\")\n    epics_pva = EpicsPVATransport(epicspva=epics_options)\n\n    quirks = SecopQuirks(\n        raw_accessibles=[\n            (\"valve_controller\", \"_domains_to_extract\"),\n            (\"valve_controller\", \"_terminal_values\"),\n        ],\n    )\n\n    controller = SecopController(\n        settings=IPConnectionSettings(ip=args.ip, port=args.port),\n        quirks=quirks,\n    )\n\n    fastcs = FastCS(\n        controller,\n        [epics_pva],\n    )\n    fastcs.run(interactive=True)\n",
+      "names": [
+        {
+          "import_components": [
+            "argparse"
+          ],
+          "code_str": "argparse",
+          "lineno": 3,
+          "end_lineno": 3,
+          "context": "import_target",
+          "resolved_location": "argparse"
+        },
+        {
+          "import_components": [
+            "asyncio"
+          ],
+          "code_str": "asyncio",
+          "lineno": 4,
+          "end_lineno": 4,
+          "context": "import_target",
+          "resolved_location": "asyncio"
+        },
+        {
+          "import_components": [
+            "logging"
+          ],
+          "code_str": "logging",
+          "lineno": 5,
+          "end_lineno": 5,
+          "context": "import_target",
+          "resolved_location": "logging"
+        },
+        {
+          "import_components": [
+            "socket"
+          ],
+          "code_str": "socket",
+          "lineno": 6,
+          "end_lineno": 6,
+          "context": "import_target",
+          "resolved_location": "socket"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "connections"
+          ],
+          "code_str": "fastcs.connections",
+          "lineno": 8,
+          "end_lineno": 8,
+          "context": "import_from",
+          "resolved_location": "fastcs.connections"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "connections",
+            "IPConnectionSettings"
+          ],
+          "code_str": "IPConnectionSettings",
+          "lineno": 8,
+          "end_lineno": 8,
+          "context": "import_target",
+          "resolved_location": "fastcs.connections.ip_connection.IPConnectionSettings"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "launch"
+          ],
+          "code_str": "fastcs.launch",
+          "lineno": 9,
+          "end_lineno": 9,
+          "context": "import_from",
+          "resolved_location": "fastcs.launch"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "launch",
+            "FastCS"
+          ],
+          "code_str": "FastCS",
+          "lineno": 9,
+          "end_lineno": 9,
+          "context": "import_target",
+          "resolved_location": "fastcs.control_system.FastCS"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "logging"
+          ],
+          "code_str": "fastcs.logging",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "import_from",
+          "resolved_location": "fastcs.logging"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "logging",
+            "configure_logging"
+          ],
+          "code_str": "configure_logging",
+          "lineno": 10,
+          "end_lineno": 10,
+          "context": "import_target",
+          "resolved_location": "fastcs.logging.configure_logging"
+        },
+        {
+          "import_components": [
+            "fastcs_secop"
+          ],
+          "code_str": "fastcs_secop",
+          "lineno": 12,
+          "end_lineno": 12,
+          "context": "import_from",
+          "resolved_location": "fastcs_secop"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController"
+          ],
+          "code_str": "SecopController",
+          "lineno": 12,
+          "end_lineno": 12,
+          "context": "import_target",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks"
+          ],
+          "code_str": "SecopQuirks",
+          "lineno": 12,
+          "end_lineno": 12,
+          "context": "import_target",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "transports"
+          ],
+          "code_str": "fastcs.transports",
+          "lineno": 15,
+          "end_lineno": 15,
+          "context": "import_from",
+          "resolved_location": "fastcs.transports"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser"
+          ],
+          "code_str": "argparse.ArgumentParser",
+          "lineno": 18,
+          "end_lineno": 18,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser",
+            "()"
+          ],
+          "code_str": "parser",
+          "lineno": 18,
+          "end_lineno": 18,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser",
+            "()",
+            "add_argument"
+          ],
+          "code_str": "parser.add_argument",
+          "lineno": 19,
+          "end_lineno": 19,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser.add_argument"
+        },
+        {
+          "import_components": [
+            "str"
+          ],
+          "code_str": "str",
+          "lineno": 19,
+          "end_lineno": 19,
+          "context": "none",
+          "resolved_location": "str"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser",
+            "()",
+            "add_argument"
+          ],
+          "code_str": "parser.add_argument",
+          "lineno": 20,
+          "end_lineno": 20,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser.add_argument"
+        },
+        {
+          "import_components": [
+            "int"
+          ],
+          "code_str": "int",
+          "lineno": 20,
+          "end_lineno": 20,
+          "context": "none",
+          "resolved_location": "int"
+        },
+        {
+          "import_components": [
+            "argparse",
+            "ArgumentParser",
+            "()",
+            "parse_args"
+          ],
+          "code_str": "parser.parse_args",
+          "lineno": 21,
+          "end_lineno": 21,
+          "context": "none",
+          "resolved_location": "argparse.ArgumentParser.parse_args"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "logging",
+            "configure_logging"
+          ],
+          "code_str": "configure_logging",
+          "lineno": 23,
+          "end_lineno": 23,
+          "context": "none",
+          "resolved_location": "fastcs.logging.configure_logging"
+        },
+        {
+          "import_components": [
+            "logging",
+            "basicConfig"
+          ],
+          "code_str": "logging.basicConfig",
+          "lineno": 24,
+          "end_lineno": 24,
+          "context": "none",
+          "resolved_location": "logging.basicConfig"
+        },
+        {
+          "import_components": [
+            "asyncio",
+            "get_event_loop"
+          ],
+          "code_str": "asyncio.get_event_loop",
+          "lineno": 26,
+          "end_lineno": 26,
+          "context": "none",
+          "resolved_location": "asyncio.get_event_loop"
+        },
+        {
+          "import_components": [
+            "socket",
+            "gethostname"
+          ],
+          "code_str": "socket.gethostname",
+          "lineno": 28,
+          "end_lineno": 28,
+          "context": "none",
+          "resolved_location": "socket.gethostname"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks"
+          ],
+          "code_str": "SecopQuirks",
+          "lineno": 31,
+          "end_lineno": 31,
+          "context": "none",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks",
+            "()"
+          ],
+          "code_str": "quirks",
+          "lineno": 31,
+          "end_lineno": 31,
+          "context": "none",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController"
+          ],
+          "code_str": "SecopController",
+          "lineno": 38,
+          "end_lineno": 38,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "connections",
+            "IPConnectionSettings"
+          ],
+          "code_str": "IPConnectionSettings",
+          "lineno": 39,
+          "end_lineno": 39,
+          "context": "none",
+          "resolved_location": "fastcs.connections.ip_connection.IPConnectionSettings"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopQuirks",
+            "()"
+          ],
+          "code_str": "quirks",
+          "lineno": 40,
+          "end_lineno": 40,
+          "context": "none",
+          "resolved_location": "fastcs_secop._util.SecopQuirks"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController",
+            "()"
+          ],
+          "code_str": "controller",
+          "lineno": 38,
+          "end_lineno": 38,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "launch",
+            "FastCS"
+          ],
+          "code_str": "FastCS",
+          "lineno": 43,
+          "end_lineno": 43,
+          "context": "none",
+          "resolved_location": "fastcs.control_system.FastCS"
+        },
+        {
+          "import_components": [
+            "fastcs_secop",
+            "SecopController",
+            "()"
+          ],
+          "code_str": "controller",
+          "lineno": 44,
+          "end_lineno": 44,
+          "context": "none",
+          "resolved_location": "fastcs_secop._controllers.SecopController"
+        },
+        {
+          "import_components": [
+            "fastcs",
+            "launch",
+            "FastCS",
+            "()"
+          ],
+          "code_str": "fastcs",
+          "lineno": 43,
+          "end_lineno": 43,
+          "context": "none",
+          "resolved_location": "fastcs.control_system.FastCS"
+        }
+      ],
+      "example": {
+        "document": "transports\\epics_pva",
+        "ref_id": "example-pva-ioc",
+        "headings": [
+          "EPICS PV Access",
+          "Example PVA IOC"
+        ]
+      },
+      "doc_lineno": 34
+    }
+  ],
+  "transports\\tango": []
+}
