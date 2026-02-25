@@ -8,6 +8,7 @@ import socket
 from fastcs.connections import IPConnectionSettings
 from fastcs.launch import FastCS
 from fastcs.logging import LogLevel, configure_logging
+from fastcs.transports.epics.pv_namer import IsisPvNamer
 
 from fastcs_secop import SecopController, SecopQuirks
 
@@ -25,7 +26,9 @@ if __name__ == "__main__":
 
     asyncio.get_event_loop().slow_callback_duration = 1000
 
-    epics_options = EpicsIOCOptions(pv_prefix=f"TE:{socket.gethostname().upper()}:SECOP")
+    epics_options = EpicsIOCOptions(
+        pv_prefix=f"TE:{socket.gethostname().upper()}:SECOP", pv_namer=IsisPvNamer()
+    )
     epics_ca = EpicsCATransport(epicsca=epics_options)
 
     quirks = SecopQuirks(
