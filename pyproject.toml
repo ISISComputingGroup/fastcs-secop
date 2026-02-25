@@ -43,8 +43,8 @@ doc = [
   "sphinxcontrib-spelling",
 ]
 lint = [
-  "pyright",
-  "ruff",
+  "pyright==1.1.408",
+  "ruff==0.15.2",
 ]
 test = [
   "lewis",

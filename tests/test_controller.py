@@ -15,13 +15,12 @@ from fastcs_secop import (
 
 @pytest.fixture
 def controller():
-    controller = SecopController(
+    return SecopController(
         settings=IPConnectionSettings(
             ip="127.0.0.1",
             port=65535,
         )
     )
-    return controller
 
 
 async def test_ping_happy_path(controller):

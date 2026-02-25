@@ -110,15 +110,11 @@ def tuple_structured_dtype(datainfo: dict[str, Any]) -> list[tuple[str, npt.DTyp
     secop_dtypes = [t for t in datainfo["members"]]
     np_dtypes = [secop_dtype_to_numpy_dtype(t) for t in secop_dtypes]
     names = [f"e{n}" for n in range(len(datainfo["members"]))]
-    structured_np_dtype = list(zip(names, np_dtypes, strict=True))
-    return structured_np_dtype
+    return list(zip(names, np_dtypes, strict=True))
 
 
 def struct_structured_dtype(datainfo: dict[str, Any]) -> list[tuple[str, npt.DTypeLike]]:
-    structured_np_dtype = [
-        (k, secop_dtype_to_numpy_dtype(v)) for k, v in datainfo["members"].items()
-    ]
-    return structured_np_dtype
+    return [(k, secop_dtype_to_numpy_dtype(v)) for k, v in datainfo["members"].items()]
 
 
 def secop_datainfo_to_fastcs_dtype(datainfo: dict[str, Any], raw: bool = False) -> DataType[Any]:
