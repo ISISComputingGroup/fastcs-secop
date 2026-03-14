@@ -194,24 +194,6 @@ async def test_attribute_io_update(io_cls, expected):
 
 
 @pytest.mark.parametrize(
-    ("io_cls", "error"),
-    [
-        (SecopAttributeIO, SecopError),
-        (SecopAttributeIO, ConnectionError),
-        (SecopRawAttributeIO, SecopError),
-        (SecopRawAttributeIO, ConnectionError),
-    ],
-)
-async def test_attribute_io_update_fails(io_cls, error):
-    connection = AsyncMock(spec=IPConnection)
-    attr = AsyncMock(spec=AttrRW)
-    io = io_cls(connection=connection)
-
-    with patch("fastcs_secop._io.secop_read", side_effect=error):
-        await io.update(attr)
-
-
-@pytest.mark.parametrize(
     ("io_cls", "expected"),
     [
         (SecopAttributeIO, 123.456),

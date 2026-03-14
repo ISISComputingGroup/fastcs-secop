@@ -1,5 +1,6 @@
 """FastCS controllers for SECoP nodes."""
 
+import asyncio
 import typing
 import uuid
 from logging import getLogger
@@ -268,7 +269,17 @@ class SecopController(Controller):
 
     async def connect(self) -> None:
         """Connect to the SECoP node."""
-        await self._connection.connect(self._ip_settings)
+        try:
+            await self._connection.connect(self._ip_settings)
+            self._connected = True
+        except Exception as e:
+            logger.error("Failed to (re-)connect to SECoP node due to %s", e)
+            self._connected = False
+
+    async def reconnect(self) -> None:
+        if self._connected:
+            return
+        await self.connect()
 
     async def deactivate(self) -> None:
         """Turn off asynchronous SECoP communication.
@@ -279,22 +290,13 @@ class SecopController(Controller):
 
     @scan(15.0)
     async def ping(self) -> None:
-        """Ping the SECoP device, to check connection is still open.
-
-        Attempts to reconnect if the connection was not open (e.g. closed
-        by remote end or network break).
-        """
-        try:
-            token = uuid.uuid4()
-            await self._connection.send_query(f"ping {token}\n")
-        except ConnectionError:
-            logger.info("Detected connection loss, attempting reconnect.")
-            try:
-                await self.connect()
-                await self.deactivate()
-                logger.info("Reconnect successful.")
-            except Exception:
-                logger.info("Reconnect failed.")
+        """Ping the SECoP device, to check connection is still open."""
+        token = uuid.uuid4()
+        response = await self._connection.send_query(f"ping {token}\n")
+        if not response.startswith(f"pong {token}"):
+            raise SecopError(
+                f"Unexpected response to SECoP ping (token={token}, response={response})"
+            )
 
     async def check_idn(self) -> None:
         """Verify that the device is a SECoP device.
@@ -352,9 +354,12 @@ class SecopController(Controller):
 
         """
         await self.connect()
+        if not self._connected:
+            raise SecopError("Could not connect to SECoP node at FastCS startup")
         await self.check_idn()
         await self.deactivate()
         await self._create_modules()
+        await self._create_reconnect_task()
 
     async def _create_modules(self) -> None:
         """Create subcontrollers for each SECoP module."""
@@ -386,3 +391,13 @@ class SecopController(Controller):
             )
             await module_controller.initialise()
             self.add_sub_controller(name=module_name, sub_controller=module_controller)
+
+    async def _create_reconnect_task(self) -> None:
+        """Schedule a reconnection attempt every 15 seconds."""
+
+        async def _reconnect_task() -> None:
+            while True:
+                await self.reconnect()
+                await asyncio.sleep(15)
+
+        self._reconnect_task = asyncio.create_task(_reconnect_task())

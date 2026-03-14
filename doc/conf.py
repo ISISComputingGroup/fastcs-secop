@@ -88,7 +88,7 @@ spelling_suggestion_limit = 3
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "secop": ("https://sampleenvironment.github.io/secop-site/", None),
-    "fastcs": ("https://diamondlightsource.github.io/FastCS/main/", None),
+    "fastcs": ("https://diamondlightsource.github.io/fastcs/main/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "epics": ("https://docs.epics-controls.org/en/latest/", None),
     "epics_base": ("https://docs.epics-controls.org/projects/base/en/latest/", None),

@@ -1,3 +1,4 @@
+import asyncio
 from unittest.mock import AsyncMock, patch
 
 import orjson
@@ -23,34 +24,33 @@ def controller():
     )
 
 
+async def test_connect_fails(controller):
+    with patch.object(controller._connection, "send_query", AsyncMock(side_effect=IOError)):
+        await controller.connect()
+        assert not controller._connected
+
+
+async def test_reconnect_fails(controller):
+    with patch.object(controller._connection, "send_query", AsyncMock(side_effect=IOError)):
+        await controller.reconnect()
+        assert not controller._connected
+
+
 async def test_ping_happy_path(controller):
-    with patch.object(controller._connection, "send_query", AsyncMock(return_value="pong")):
-        controller.connect = AsyncMock()
+    async def ping_response(inp):
+        await asyncio.sleep(0)
+        return f"pong {inp[5:]}\n"
+
+    with patch.object(controller._connection, "send_query", ping_response):
         await controller.ping()
-        controller.connect.assert_not_awaited()
 
 
-async def test_ping_raises_disconnected_error(controller):
-    with patch.object(controller._connection, "send_query", AsyncMock(side_effect=ConnectionError)):
-        controller.connect = AsyncMock()
-        await controller.ping()
-        controller.connect.assert_awaited()
-
-
-async def test_ping_raises_disconnected_error_and_reconnect_fails(controller):
-    with patch.object(controller._connection, "send_query", AsyncMock(side_effect=ConnectionError)):
-        controller.connect = AsyncMock(side_effect=ConnectionError)
-        await controller.ping()
-        controller.connect.assert_awaited()
-
-
-async def test_ping_raises_disconnected_error_and_reconnect_works(controller):
-    with patch.object(
-        controller._connection, "send_query", AsyncMock(side_effect=[ConnectionError, "I'm alive"])
+async def test_ping_bad_response(controller):
+    with (
+        pytest.raises(SecopError, match=r"Unexpected response to SECoP ping .*"),
+        patch.object(controller._connection, "send_query", AsyncMock(return_value="blah_blah")),
     ):
-        controller.connect = AsyncMock()
         await controller.ping()
-        controller.connect.assert_awaited()
 
 
 async def test_check_idn():
@@ -139,6 +139,27 @@ async def test_secop_module_controller_initialise():
     assert controller.attributes["normal_accessible"].dtype is int
     assert controller.attributes["raw_accessible"].dtype is str
     assert "skipped_accessible" not in controller.attributes
+
+
+async def test_cannot_connect_to_controller_at_startup():
+    controller = SecopController(
+        settings=IPConnectionSettings("127.0.0.1", 0),
+    )
+    with (
+        pytest.raises(SecopError, match=r"Could not connect to SECoP node at FastCS startup"),
+        patch.object(controller._connection, "connect", AsyncMock(side_effect=IOError)),
+    ):
+        await controller.initialise()
+
+
+async def test_reconnect_does_nothing_if_already_connected():
+    controller = SecopController(
+        settings=IPConnectionSettings("127.0.0.1", 0),
+    )
+    with patch.object(controller, "connect", AsyncMock()) as mock_connect:
+        controller._connected = True
+        await controller.reconnect()
+        assert mock_connect.call_count == 0
 
 
 async def test_command_controller_execute_invalid_response():
