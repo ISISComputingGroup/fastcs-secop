@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Demo PVA ioc")
     parser.add_argument("-i", "--ip", type=str, default="127.0.0.1", help="IP to connect to")
-    parser.add_argument("-p", "--port", type=int, help="Port to connect to")
+    parser.add_argument("-p", "--port", type=int, help="Port to connect to", required=True)
     args = parser.parse_args()
 
     configure_logging(level=LogLevel.DEBUG)

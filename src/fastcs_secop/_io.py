@@ -189,17 +189,11 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
 
     async def update(self, attr: AttrR[T, SecopAttributeIORef]) -> None:
         """Read value from device and update the value in FastCS."""
-        try:
-            raw_value = await secop_read(
-                self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
-            )
-            value = decode(raw_value, attr.io_ref.datainfo, attr)
-            await attr.update(value)
-        except ConnectionError:
-            # Reconnect will be attempted in a periodic scan task
-            pass
-        except Exception:
-            logger.exception("Exception during update()")
+        raw_value = await secop_read(
+            self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
+        )
+        value = decode(raw_value, attr.io_ref.datainfo, attr)
+        await attr.update(value)
 
     async def send(self, attr: AttrW[T, SecopAttributeIORef], value: T) -> None:
         """Send a value from FastCS to the device."""
@@ -240,18 +234,12 @@ class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
 
     async def update(self, attr: AttrR[str, SecopRawAttributeIORef]) -> None:
         """Read value from device and update the value in FastCS."""
-        try:
-            raw_value = await secop_read(
-                self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
-            )
-            # Get rid of timestamp and other specifiers, we just want the value
-            value, *_ = orjson.loads(raw_value)
-            await attr.update(orjson.dumps(value).decode())
-        except ConnectionError:
-            # Reconnect will be attempted in a periodic scan task
-            pass
-        except Exception:
-            logger.exception("Exception during update()")
+        raw_value = await secop_read(
+            self._connection, attr.io_ref.module_name, attr.io_ref.accessible_name
+        )
+        # Get rid of timestamp and other specifiers, we just want the value
+        value, *_ = orjson.loads(raw_value)
+        await attr.update(orjson.dumps(value).decode())
 
     async def send(self, attr: AttrW[str, SecopRawAttributeIORef], value: str) -> None:
         """Send a value from FastCS to the device."""
@@ -268,5 +256,5 @@ class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass
-        except Exception:
-            logger.exception("Exception during send()")
+        except Exception as e:
+            logger.error("Exception during send() for %s: %s: %s", attr, e.__class__.__name__, e)

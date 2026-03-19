@@ -31,6 +31,8 @@ def emulator():
             "stream: {bind_address: 127.0.0.1, port: 57677}",
         ],
         cwd=os.path.dirname(__file__),
+        stdout=sys.stdout,
+        stderr=sys.stderr,
     )
     try:
         yield
@@ -48,10 +50,10 @@ async def controller():
     )
 
     for _ in range(100):
-        try:
-            await controller.connect()
+        await controller.connect()
+        if controller._connected:
             break
-        except Exception:
+        else:
             await asyncio.sleep(0.1)
     else:
         raise RuntimeError("Could not connect to emulator within 10s")

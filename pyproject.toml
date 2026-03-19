@@ -27,8 +27,7 @@ classifiers = [
 ]
 
 dependencies = [
-  # Remove pin when new release made
-  "fastcs @ git+https://github.com/DiamondLightSource/FastCS",
+  "fastcs>=0.12.0",
   "orjson",
 ]
 
@@ -44,7 +43,7 @@ doc = [
 ]
 lint = [
   "pyright==1.1.408",
-  "ruff==0.15.5",
+  "ruff==0.15.6",
 ]
 test = [
   "lewis",
