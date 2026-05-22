@@ -34,6 +34,7 @@ ignore = [
     "D203",    # Incompatible with D211
     "PLR6301", # Too noisy
     "BLE001",  # Need to prevent arbitrary exceptions from terminating FastCS update loops
+    "PLW0717", # Need broad try-excepts to stop program from terminating
 ]
 [lint.per-file-ignores]
 "tests/*" = [
