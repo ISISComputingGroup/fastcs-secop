@@ -1,6 +1,7 @@
 accessible
 accessibles
 bool
+dataclass
 datainfo
 datatype
 datatypes
