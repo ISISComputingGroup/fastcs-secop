@@ -12,7 +12,7 @@ from fastcs.attributes import AttrR
 from fastcs.connections import IPConnectionSettings
 from fastcs.logging import LogLevel, configure_logging
 
-from fastcs_secop import SecopController
+from fastcs_secop import SecopController, SecopControllerSettings
 
 configure_logging(level=LogLevel.TRACE)
 
@@ -43,9 +43,11 @@ def emulator():
 @pytest.fixture
 async def controller():
     controller = SecopController(
-        settings=IPConnectionSettings(
-            ip="127.0.0.1",
-            port=57677,
+        SecopControllerSettings(
+            connection=IPConnectionSettings(
+                ip="127.0.0.1",
+                port=57677,
+            )
         ),
     )
 

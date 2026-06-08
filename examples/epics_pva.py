@@ -8,13 +8,11 @@ import socket
 from fastcs.connections import IPConnectionSettings
 from fastcs.launch import FastCS
 from fastcs.logging import LogLevel, configure_logging
+from fastcs.transports.epics.pva import EpicsPVATransport
 
-from fastcs_secop import SecopController, SecopQuirks
+from fastcs_secop import SecopController, SecopControllerSettings, SecopQuirks
 
 if __name__ == "__main__":
-    from fastcs.transports import EpicsIOCOptions
-    from fastcs.transports.epics.pva import EpicsPVATransport
-
     parser = argparse.ArgumentParser(description="Demo PVA ioc")
     parser.add_argument("-i", "--ip", type=str, default="127.0.0.1", help="IP to connect to")
     parser.add_argument("-p", "--port", type=int, help="Port to connect to", required=True)
@@ -25,9 +23,6 @@ if __name__ == "__main__":
 
     asyncio.get_event_loop().slow_callback_duration = 1000
 
-    epics_options = EpicsIOCOptions(pv_prefix=f"TE:{socket.gethostname().upper()}:SECOP")
-    epics_pva = EpicsPVATransport(epicspva=epics_options)
-
     quirks = SecopQuirks(
         raw_accessibles=[
             ("valve_controller", "_domains_to_extract"),
@@ -36,12 +31,16 @@ if __name__ == "__main__":
     )
 
     controller = SecopController(
-        settings=IPConnectionSettings(ip=args.ip, port=args.port),
-        quirks=quirks,
+        SecopControllerSettings(
+            connection=IPConnectionSettings(ip=args.ip, port=args.port),
+            quirks=quirks,
+        )
     )
+
+    controller.set_path(["TE", socket.gethostname(), "SECOP"])
 
     fastcs = FastCS(
         controller,
-        [epics_pva],
+        [EpicsPVATransport()],
     )
     fastcs.run(interactive=True)
