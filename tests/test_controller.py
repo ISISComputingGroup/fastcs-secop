@@ -8,6 +8,7 @@ from fastcs.connections import IPConnectionSettings
 from fastcs_secop import (
     SecopCommandController,
     SecopController,
+    SecopControllerSettings,
     SecopError,
     SecopModuleController,
     SecopQuirks,
@@ -17,9 +18,11 @@ from fastcs_secop import (
 @pytest.fixture
 def controller():
     return SecopController(
-        settings=IPConnectionSettings(
-            ip="127.0.0.1",
-            port=65535,
+        SecopControllerSettings(
+            connection=IPConnectionSettings(
+                ip="127.0.0.1",
+                port=65535,
+            ),
         )
     )
 
@@ -54,7 +57,7 @@ async def test_ping_bad_response(controller):
 
 
 async def test_check_idn():
-    controller = SecopController(settings=IPConnectionSettings("127.0.0.1", 0))
+    controller = SecopController(SecopControllerSettings(IPConnectionSettings("127.0.0.1", 0)))
     controller._connection = AsyncMock()
 
     controller._connection.send_query.return_value = "ISSE&SINE2020,SECoP,foo,bar"
@@ -78,8 +81,10 @@ async def test_check_idn():
 
 async def test_create_modules():
     controller = SecopController(
-        settings=IPConnectionSettings("127.0.0.1", 0),
-        quirks=SecopQuirks(skip_modules="a_skipped_module"),
+        SecopControllerSettings(
+            connection=IPConnectionSettings("127.0.0.1", 0),
+            quirks=SecopQuirks(skip_modules="a_skipped_module"),
+        )
     )
     controller._connection = AsyncMock()
     controller._connection.send_query.return_value = (
@@ -106,8 +111,10 @@ async def test_create_modules():
 
 async def test_create_modules_bad_description():
     controller = SecopController(
-        settings=IPConnectionSettings("127.0.0.1", 0),
-        quirks=SecopQuirks(skip_modules="a_skipped_module"),
+        SecopControllerSettings(
+            connection=IPConnectionSettings("127.0.0.1", 0),
+            quirks=SecopQuirks(skip_modules="a_skipped_module"),
+        )
     )
     controller._connection = AsyncMock()
     controller._connection.send_query.return_value = "a huge pile of nonsense\n"
@@ -143,7 +150,7 @@ async def test_secop_module_controller_initialise():
 
 async def test_cannot_connect_to_controller_at_startup():
     controller = SecopController(
-        settings=IPConnectionSettings("127.0.0.1", 0),
+        SecopControllerSettings(IPConnectionSettings("127.0.0.1", 0)),
     )
     with (
         pytest.raises(SecopError, match=r"Could not connect to SECoP node at FastCS startup"),
@@ -154,7 +161,7 @@ async def test_cannot_connect_to_controller_at_startup():
 
 async def test_reconnect_does_nothing_if_already_connected():
     controller = SecopController(
-        settings=IPConnectionSettings("127.0.0.1", 0),
+        SecopControllerSettings(IPConnectionSettings("127.0.0.1", 0)),
     )
     with patch.object(controller, "connect", AsyncMock()) as mock_connect:
         controller._connected = True

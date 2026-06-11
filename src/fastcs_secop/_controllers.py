@@ -1,6 +1,7 @@
 """FastCS controllers for SECoP nodes."""
 
 import asyncio
+import dataclasses
 import typing
 import uuid
 from logging import getLogger
@@ -22,6 +23,21 @@ from fastcs_secop._io import (
 from fastcs_secop._util import SecopError, SecopQuirks, is_raw, secop_datainfo_to_fastcs_dtype
 
 logger = getLogger(__name__)
+
+
+@dataclasses.dataclass
+class SecopControllerSettings:
+    """Top-level settings dataclass for a SECoP controller."""
+
+    connection: IPConnectionSettings
+    """
+    The communication settings (e.g. IP address, port) at which the SECoP node is reachable.
+    """
+
+    quirks: SecopQuirks | None = None
+    """
+    :py:obj:`~fastcs_secop.SecopQuirks` that affect how attributes are processed in this controller.
+    """
 
 
 class SecopCommandController(Controller):
@@ -229,19 +245,21 @@ class SecopModuleController(Controller):
 class SecopController(Controller):
     """FastCS Controller for a SECoP node."""
 
-    def __init__(self, settings: IPConnectionSettings, quirks: SecopQuirks | None = None) -> None:
+    def __init__(self, settings: SecopControllerSettings) -> None:
         """FastCS Controller for a SECoP node.
 
         The intended usage is via :py:obj:`fastcs.control_system.FastCS`:
 
         .. code-block:: python
 
-            from fastcs_secop import SecopController, SecopQuirks
+            from fastcs_secop import SecopController, SecopQuirks, SecopControllerSettings
             from fastcs.control_system import FastCS
 
             controller = SecopController(
-                settings=IPConnectionSettings(ip="127.0.0.1", port=1234),
-                quirks=SecopQuirks(...),
+                SecopControllerSettings(
+                    connection=IPConnectionSettings(ip="127.0.0.1", port=1234),
+                    quirks=SecopQuirks(...),
+                )
             )
 
             transports = [...]
@@ -256,14 +274,12 @@ class SecopController(Controller):
             :ref:`example_ca_ioc` and :ref:`example_pva_ioc` for examples of full configurations
 
         Args:
-            settings: The communication settings (e.g. IP address, port) at which
-                the SECoP node is reachable.
-            quirks: :py:obj:`~fastcs_secop.SecopQuirks` that affects how attributes are processed.
+            settings: SECoP device settings (see :py:obj:`SecopControllerSettings` for details)
 
         """
-        self._ip_settings = settings
+        self._ip_settings = settings.connection
         self._connection = IPConnection()
-        self._quirks = quirks or SecopQuirks()
+        self._quirks = settings.quirks or SecopQuirks()
 
         super().__init__()
 
