@@ -17,7 +17,7 @@ from fastcs_secop import SecopController, SecopControllerSettings
 configure_logging(level=LogLevel.TRACE)
 
 
-@pytest.fixture(autouse=True, scope="class")
+@pytest.fixture(scope="class")
 def emulator():
     proc = subprocess.Popen(
         [
@@ -84,7 +84,7 @@ async def controller():
 
 
 class TestInitialState:
-    def test_sub_controllers_created(self, controller):
+    def test_sub_controllers_created(self, controller, emulator):
         assert "one_of_everything" in controller.sub_controllers
 
     @pytest.mark.parametrize(
@@ -98,14 +98,14 @@ class TestInitialState:
         ],
     )
     async def test_attributes_created_for_simple_datatype(
-        self, controller, param, expected_initial_value
+        self, controller, emulator, param, expected_initial_value
     ):
         attr: AttrR = typing.cast(
             AttrR, controller.sub_controllers["one_of_everything"].attributes[param]
         )
         await attr.wait_for_value(expected_initial_value, timeout=2)
 
-    async def test_attributes_created_for_enum_datatype(self, controller):
+    async def test_attributes_created_for_enum_datatype(self, controller, emulator):
         attr: AttrR = typing.cast(
             AttrR, controller.sub_controllers["one_of_everything"].attributes["enum"]
         )
@@ -147,7 +147,7 @@ class TestInitialState:
         ],
     )
     async def test_attributes_created_for_array_datatype(
-        self, controller, param, expected_initial_value
+        self, controller, emulator, param, expected_initial_value
     ):
         attr: AttrR = typing.cast(
             AttrR, controller.sub_controllers["one_of_everything"].attributes[param]
@@ -165,6 +165,8 @@ class TestInitialState:
             ("command_null_null", set()),
         ],
     )
-    async def test_command_attributes_created(self, controller, command, expected_attributes):
+    async def test_command_attributes_created(
+        self, controller, emulator, command, expected_attributes
+    ):
         cmd_controller = controller.sub_controllers["one_of_everything"].sub_controllers[command]
         assert set(cmd_controller.attributes.keys()) == expected_attributes
