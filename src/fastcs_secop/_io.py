@@ -23,7 +23,7 @@ from fastcs_secop._util import (
 logger = getLogger(__name__)
 
 
-T: TypeAlias = int | float | str | bool | Enum | npt.NDArray[Any]  # noqa: UP040 (sphinx doesn't like it)
+T: TypeAlias = int | float | str | bool | Enum | npt.NDArray[Any]  # ruff:ignore[non-pep695-type-alias] (sphinx doesn't like it)
 """Generic type parameter for SECoP IO."""
 
 
@@ -96,7 +96,7 @@ class SecopRawAttributeIORef(AttributeIORef):
     accessible_name: str = ""
 
 
-def decode(raw_value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # noqa ANN401
+def decode(raw_value: str, datainfo: dict[str, Any], attr: AttrR[T]) -> T:  # ruff:ignore[undocumented-param] ANN401
     """Decode the transported value into a python datatype.
 
     Args:
@@ -207,7 +207,7 @@ class SecopAttributeIO(AttributeIO[T, SecopAttributeIORef]):
             )
             # Ugly, but I can't find a public alternative...
             # https://github.com/DiamondLightSource/FastCS/pull/292
-            await attr._call_sync_setpoint_callbacks(value)  # noqa: SLF001
+            await attr._call_sync_setpoint_callbacks(value)  # ruff:ignore[private-member-access]
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass
@@ -252,7 +252,7 @@ class SecopRawAttributeIO(AttributeIO[str, SecopRawAttributeIORef]):
             )
             # Ugly, but I can't find a public alternative...
             # https://github.com/DiamondLightSource/FastCS/pull/292
-            await attr._call_sync_setpoint_callbacks(value)  # noqa: SLF001
+            await attr._call_sync_setpoint_callbacks(value)  # ruff:ignore[private-member-access]
         except ConnectionError:
             # Reconnect will be attempted in a periodic scan task
             pass
