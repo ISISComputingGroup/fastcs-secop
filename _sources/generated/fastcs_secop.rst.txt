@@ -1,0 +1,25 @@
+﻿
+
+``fastcs_secop``
+================
+
+.. automodule:: fastcs_secop
+    :members:
+    :show-inheritance:
+
+    
+    
+    .. rubric:: Submodules
+
+    .. autosummary::
+        :toctree:
+        :template: custom-module-template.rst
+        :recursive:
+    
+        version
+    
+    
+
+    
+    
+    
