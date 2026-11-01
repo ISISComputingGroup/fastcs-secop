@@ -1,0 +1,16 @@
+
+
+``fastcs_secop.version``
+========================
+
+.. automodule:: fastcs_secop.version
+    :members:
+    :show-inheritance:
+
+    
+    
+    
+
+    
+    
+    
